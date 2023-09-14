@@ -1,5 +1,6 @@
 package com.example.investment.dao;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -12,7 +13,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="user")
-public class UserDao {
+public class UserDao implements Serializable {
     /** デフォルトシリアルUID */
     private static final long serialVersionUID = 1L;
 

@@ -39,7 +39,7 @@ public class InvestmentDao implements Serializable {
 
     /** 暴落設定 */
     @Column
-    private int cresh;
+    private int crash;
 
     /**
      * デフォルトコンストラクタ。

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="..\static\css\Login.css" th:href="@{/css/Login.css}">
+  <title>ログイン画面</title>
+</head>
+<script src="../../js/UserCheck.js"></script>
+<body>
+  <div class="center">
+    <form action="/todoLogin" method="POST">
+      <div class="mailaddress">メールアドレス</div>
+      <div class="div"><input type="email" name="mailaddress" class="text-form1" required></div>
+      <div class="password">パスワード</div>
+      <div class="div"><input type="password" name="password" class="text-form1" oninput="passwordCheck(this)" required></div>
+      <button class="buttonBase button1">開始</button>
+    </form>
+    <button class="buttonBase button2" onclick="location.href='users'">新規登録</button>
+  </div>
+</body>
+</html>

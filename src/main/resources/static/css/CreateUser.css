@@ -1,0 +1,104 @@
+body {
+	width: 100%;
+}
+
+.error {
+	font-size: 20px;
+	color: red;
+	margin-top: 10px;
+	margin-bottom: -10px;
+}
+
+.title {
+	float: left;
+	font-size: 60px;
+	margin: 10px;
+}
+
+.center {
+	text-align: center;
+}
+
+.name {
+	font-size: 35px;
+	margin-right: 450px;
+	margin-bottom: -45px;
+	margin-top: 200px;
+}
+
+.mailaddress {
+	font-size: 35px;
+	margin-right: 450px;
+	margin-bottom: -45px;
+	margin-top: 50px;
+}
+
+.password {
+	font-size: 35px;
+	margin-right: 380px;
+	margin-bottom: -45px;
+	margin-top: 50px;
+}
+
+.div {
+	margin-left: 150px;
+	margin-bottom: -15px;
+}
+
+.divProfile{
+	text-align: right;
+}
+
+.buttonBase {
+	appearance: none;
+	border: 0;
+	border-radius: 5px;
+	color: #fff;
+	background: #4676D7;
+	cursor: pointer;
+}
+
+.buttonBase:hover {
+	background: #1d49aa;
+}
+
+.buttonBase:focus {
+	outline: none;
+	box-shadow: 0 0 0 4px #cbd6ee;
+}
+
+.button1 {
+	margin-right: 180px;
+	width: 180px;
+	padding: 4px;
+	font-size: 25px;
+	background: #4676D7;
+	text-align: center;
+}
+
+.button2 {
+	margin-top: 100px;
+	width: 180px;
+	padding: 4px 50px;
+	font-size: 25px;
+	background: #4676D7;
+	text-align: center;
+}
+
+.button3 {
+	margin-right: 15px;
+	background: #696969;
+}
+
+.text-form1 {
+	height: 2.6em;
+	width: 350px;
+	margin-left: 50px;
+	padding: 1 16px;
+	border-radius: 4px;
+	border: none;
+	box-shadow: 0 0 0 1px #ccc inset;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}

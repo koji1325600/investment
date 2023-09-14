@@ -19,7 +19,6 @@ public class InvestmentDao implements Serializable {
 
     /** ID */
     @Id
-    @Column
     private String id;
 
     /** 名前 */

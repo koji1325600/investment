@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<UserDao, String>, JpaSpeci
 
     /** メールアドレスでユーザID取得 */
     @Query("SELECT X.userId FROM UserDao X WHERE X.mailaddress = ?1")
-    Integer findByMailaddressInt(String mailaddress);
+    String findByMailaddressInt(String mailaddress);
 }

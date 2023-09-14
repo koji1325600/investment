@@ -42,7 +42,7 @@ public class LoginController {
         }
         //Sessionにユーザ名を設定
         httpServletRequest.getSession().setAttribute("userId", userDao.getUserId());
-        return "redirect:invest/investList";
+        return "redirect:home";
     }
 
     /** ログアウト */

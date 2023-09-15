@@ -40,9 +40,9 @@ public class LoginController {
             //ログイン画面に戻る
             return "redirect:/login";
         }
-        //Sessionにユーザ名を設定
+        //SessionにユーザIDを設定
         httpServletRequest.getSession().setAttribute("userId", userDao.getUserId());
-        return "redirect:invest/investList";
+        return "redirect:invest/home";
     }
 
     /** ログアウト */

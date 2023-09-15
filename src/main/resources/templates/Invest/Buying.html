@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="..\static\css\Home.css" th:href="@{/css/Home.css}">
+  <title>売買</title>
+</head>
+<script src="../../js/TodoCheck.js"></script>
+<body>
+  <h2>売買</h2>
+  <form action="buyInvest" method="POST">
+    <select name="id">
+      <tr th:each="invest : ${investList}">
+        <option th:value="${invest.id}"><a th:text="${invest.name}"></a></option>
+      </tr>
+    </select>
+    個数
+    <input type="text" name="quantity">
+    <button>購入</button>
+    <a th:text="${money}"></a>
+  </form>
+  <h2>購入取引一覧</h2>
+  <table>
+    <tr style="background-color: #a9a9a9">
+      <th>商品名</th>
+      <th>個数</th>
+      <th>購入価格</th>
+    </tr>
+    <tr th:each="buy : ${buyList}">
+      <td><a th:text="${buy.investName}"></a></td>
+      <td><a th:text="${buy.quantity}"></a></td>
+      <td><a th:text="${buy.buyPrice}"></a></td>
+    </tr>
+  </table>
+</body>
+</html>

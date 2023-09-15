@@ -12,8 +12,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="investment")
-public class InvestmentDao implements Serializable {
+@Table(name="buying")
+public class BuyingDao implements Serializable {
     /** デフォルトシリアルUID */
     private static final long serialVersionUID = 1L;
 
@@ -21,25 +21,29 @@ public class InvestmentDao implements Serializable {
     @Id
     private String id;
 
-    /** 名前 */
+    /** 取引ID */
     @Column
-    private String name;
+    private String investId;
 
-    /** 最大価格 */
-    @Column(name="max_price")
-    private int maxPrice;
-
-    /** 最小価格 */
-    @Column(name="min_price")
-    private int minPrice;
-
-    /** 価格 */
+    /** ユーザID */
     @Column
-    private int price;
+    private String userId;
 
-    /** 暴落設定 */
+    /** 取引名 */
     @Column
-    private int crash;
+    private String investName;
+
+    /** ユーザ名 */
+    @Column
+    private String userName;
+
+    /** 個数 */
+    @Column
+    private int quantity;
+
+    /** 購入価格 */
+    @Column(name="buy_price")
+    private int buyPrice;
 
     /**
      * デフォルトコンストラクタ。

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="..\static\css\CreateInvest.css" th:href="@{/css/CreateInvest.css}">
+  <title>取引新規作成</title>
+</head>
+<script src="../../js/CreateInvest.js"></script>
+<script src="../../js/TodoCheck.js"></script>
+<body>
+  <h2>取引登録</h2>
+  <div class="Form">
+    <form th:action="@{/invest/addInvest}" th:object="${InvestForm}" method="POST" onSubmit="Check()">
+      <div class="Form-Item">
+        <p class="Form-Item-Label"><span class="Form-Item-Label-Required">必須</span>名前</p>
+        <input type="text" name="name" class="Form-Item-Input" oninput="dateCheck(this)" required>
+      </div>
+      <div class="Form-Item">
+         <p class="Form-Item-Label"><span class="Form-Item-Label-Required">必須</span>最大価格</p>
+         <input type="text" name="maxPrice" class="Form-Item-Input" oninput="titleCheck(this)" required>
+      </div>
+      <div class="Form-Item">
+        <p class="Form-Item-Label"><span class="Form-Item-Label-Required">必須</span>最小価格</p>
+        <input type="text" name="minPrice" class="Form-Item-Input" oninput="titleCheck(this)" required>
+      </div>
+      <div class="Form-Item">
+        <p class="Form-Item-Label isMsg"><span class="Form-Item-Label-Arbitrary">任意</span>価格</p>
+        <input type="text" name="price" id="price" class="Form-Item-Input" oninput="titleCheck(this)">
+      </div>
+      <div class="Form-Item">
+        <p class="Form-Item-Label isMsg"><span class="Form-Item-Label-Arbitrary">任意</span>暴落設定</p>
+        <input type="text" name="crash" id="crash" class="Form-Item-Input" oninput="titleCheck(this)">
+      </div>
+      <button class="button1">登録</button>
+    </form>
+  </div>
+</body>
+</html>

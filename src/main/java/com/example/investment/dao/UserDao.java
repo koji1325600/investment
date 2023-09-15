@@ -34,6 +34,10 @@ public class UserDao implements Serializable {
     @Column(nullable = false)
     private String mailaddress;
 
+    /** 所持金 */
+    @Column
+    private int money;
+
     /**
      * デフォルトコンストラクタ。
      */

@@ -46,6 +46,7 @@ public class InvestmentService {
         for (InvestmentDao investDao: investList) {
             investmentRepository.save(randomPrice(investDao));
         }
+        System.out.println();
     }
 
     /** 価格乱数処理 */
@@ -63,13 +64,18 @@ public class InvestmentService {
             price = rand.nextInt(rangePrice) + (price - minRangePrice);
         }
 
-        System.out.println("rand:" + price);
+        System.out.print(investDao.getName());
+        System.out.print(" rand:" + price);
         if (price < investDao.getCrash()) {
-            System.out.println("暴落");
+            System.out.print(" 暴落");
             price = rand.nextInt(rangePrice) + (minPrice + minRangePrice);
             List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
 
             for (BuyingDao buyingDao: buyingList) {
+                UserDao userDao = userRepository.findById(buyingDao.getUserId()).get();
+                int money = buyingDao.getQuantity() * investDao.getCrash();
+                userDao.setMoney(userDao.getMoney() + money);
+                userRepository.save(userDao);
                 buyingRepository.delete(buyingDao);
             }
         }
@@ -77,8 +83,17 @@ public class InvestmentService {
         // 価格が最大価格より上にならないように
         if (price > maxPrice) {
             price = maxPrice;
+            List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
+
+            for (BuyingDao buyingDao: buyingList) {
+                UserDao userDao = userRepository.findById(buyingDao.getUserId()).get();
+                int money = buyingDao.getQuantity() * investDao.getMaxPrice();
+                userDao.setMoney(userDao.getMoney() + money);
+                userRepository.save(userDao);
+                buyingRepository.delete(buyingDao);
+            }
         }
-        System.out.println("set:" + price);
+        System.out.println(" set:" + price);
         investDao.setPrice(price);
         return investDao;
     }
@@ -111,6 +126,27 @@ public class InvestmentService {
         int money = userDao.getMoney();
 
         userDao.setMoney(money - totalPrice);
+        userRepository.save(userDao);
+    }
+
+    /** 売却処理 */
+    public void selling(String id, int quantity) {
+        InvestmentDao investDao = investmentRepository.findById(id).get();
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDao userDao = userRepository.findById(userId).get();
+        BuyingDao buyingDao = buyingRepository.findByInvestIdAndUserIdDao(id, userId);
+
+        if (quantity > buyingDao.getQuantity()) {
+            return;
+        } else if (quantity == buyingDao.getQuantity()) {
+            buyingRepository.delete(buyingDao);
+        } else {
+            buyingDao.setQuantity(buyingDao.getQuantity() - quantity);
+            buyingRepository.save(buyingDao);
+        }
+
+        int money = quantity * investDao.getPrice();
+        userDao.setMoney(userDao.getMoney() + money);
         userRepository.save(userDao);
     }
 }

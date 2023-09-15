@@ -41,7 +41,7 @@ public class InvestmentController {
     InvestmentService investmentService;
 
     /** 価格変動タスク */
-    @Scheduled(initialDelay = 10000, fixedRate = 10000)
+    @Scheduled(initialDelay = 10000, fixedRate = 3000)
     public void priceFluctuation(){
         investmentService.fluctuation();
     }
@@ -84,6 +84,13 @@ public class InvestmentController {
     @PostMapping(path = "buyInvest")
     String buyInvest(@RequestParam String id, int quantity, Model model) {
         investmentService.buying(id, quantity);
+        return "redirect:buying";
+    }
+
+    /** 取引売却 */
+    @PostMapping(path = "sellInvest")
+    String sellInvest(@RequestParam String id, int quantity, Model model) {
+        investmentService.selling(id, quantity);
         return "redirect:buying";
     }
 }

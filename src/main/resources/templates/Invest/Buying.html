@@ -19,6 +19,16 @@
     <button>購入</button>
     <a th:text="${money}"></a>
   </form>
+  <form action="sellInvest" method="POST">
+    <select name="id">
+      <tr th:each="buy : ${buyList}">
+        <option th:value="${buy.investId}"><a th:text="${buy.investName}"></a></option>
+      </tr>
+    </select>
+    個数
+    <input type="text" name="quantity">
+    <button>売却</button>
+  </form>
   <h2>購入取引一覧</h2>
   <table>
     <tr style="background-color: #a9a9a9">

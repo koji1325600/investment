@@ -12,3 +12,34 @@ table{
   table tr:nth-child(odd){
     background-color: #eee
   }
+
+  .buttonBase {
+    appearance: none;
+    border: 0;
+    border-radius: 5px;
+    color: #fff;
+    background: #4676D7;
+    cursor: pointer;
+  }
+  
+  .buttonBase:hover {
+    background: #1d49aa;
+  }
+  
+  .buttonBase:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px #cbd6ee;
+  }
+
+  .button1 {
+    margin-top: 50px;
+    width: 560px;
+    padding: 4px 50px;
+    font-size: 25px;
+    background: #4676D7;
+    text-align: center;
+  }
+
+  .center {
+    text-align: center;
+  }

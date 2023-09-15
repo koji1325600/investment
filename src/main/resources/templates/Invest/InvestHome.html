@@ -5,12 +5,12 @@
   <link rel="stylesheet" href="..\static\css\Home.css" th:href="@{/css/Home.css}">
   <title>ホーム</title>
 </head>
-<script src="../../js/Todo.js"></script>
+<script src="../../js/Home.js"></script>
 <script src="../../js/TodoCheck.js"></script>
 <body>
   <h2>取引一覧</h2>
   <table>
-    <tr>
+    <tr style="background-color: #a9a9a9">
       <th>商品名</th>
       <th>価格</th>
     </tr>
@@ -19,5 +19,8 @@
       <td><a th:text="${invest.price}"></a></td>
     </tr>
   </table>
+  <div class="center">
+    <button class="buttonBase button1" onClick="window.open('http://localhost:8080/invest/buying','_blank')">売買画面表示</button>
+  </div>
 </body>
 </html>

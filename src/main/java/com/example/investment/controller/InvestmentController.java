@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,12 @@ public class InvestmentController {
     @Autowired
     InvestmentService investmentService;
 
+    /** 価格変動タスク */
+    @Scheduled(fixedRate = 5000)
+    public void priceFluctuation(){
+        investmentService.fluctuation();
+    }
+
     /** ホーム画面に遷移する */
     @GetMapping(path = "home")
     String todo(Model model) {
@@ -41,13 +48,13 @@ public class InvestmentController {
         return "Invest/InvestHome";
     }
 
-    /**  */
+    /** 取引新規作成画面遷移 */
     @GetMapping(path = "create")
     String create(Model model) {
         return "Invest/CreateInvest";
     }
 
-    /**  */
+    /** 取引新規作成 */
     @PostMapping(path = "addInvest")
     String addInvest(@Validated InvestmentForm investmentForm, Model model) {
         investmentService.addInvent(investmentForm);

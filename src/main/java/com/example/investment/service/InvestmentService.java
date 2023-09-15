@@ -46,6 +46,7 @@ public class InvestmentService {
         for (InvestmentDao investDao: investList) {
             investmentRepository.save(randomPrice(investDao));
         }
+        System.out.println();
     }
 
     /** 価格乱数処理 */
@@ -63,13 +64,18 @@ public class InvestmentService {
             price = rand.nextInt(rangePrice) + (price - minRangePrice);
         }
 
-        System.out.println("rand:" + price);
+        System.out.print(investDao.getName());
+        System.out.print(" rand:" + price);
         if (price < investDao.getCrash()) {
-            System.out.println("暴落");
+            System.out.print(" 暴落");
             price = rand.nextInt(rangePrice) + (minPrice + minRangePrice);
             List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
 
             for (BuyingDao buyingDao: buyingList) {
+                UserDao userDao = userRepository.findById(buyingDao.getUserId()).get();
+                int money = buyingDao.getQuantity() * investDao.getCrash();
+                userDao.setMoney(userDao.getMoney() + money);
+                userRepository.save(userDao);
                 buyingRepository.delete(buyingDao);
             }
         }
@@ -78,7 +84,7 @@ public class InvestmentService {
         if (price > maxPrice) {
             price = maxPrice;
         }
-        System.out.println("set:" + price);
+        System.out.println(" set:" + price);
         investDao.setPrice(price);
         return investDao;
     }

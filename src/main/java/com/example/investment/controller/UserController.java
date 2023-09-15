@@ -5,11 +5,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.investment.form.UserFrom;
 import com.example.investment.repository.UserRepository;
 import com.example.investment.service.UserService;
 
@@ -33,8 +35,8 @@ public class UserController {
 
     /** ユーザ作成 */
     @PostMapping(path = "create")
-    String create(@RequestParam String userName, String mailaddress, String password, Model model) {
-        Boolean isCreate = userService.create(userName, mailaddress, password);
+    String create(@Validated UserFrom userFrom, Model model) {
+        Boolean isCreate = userService.create(userFrom);
         if (isCreate) {
             return "redirect:/login";
         } else {

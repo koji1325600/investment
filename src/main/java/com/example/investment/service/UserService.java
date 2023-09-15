@@ -1,10 +1,12 @@
 package com.example.investment.service;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.investment.dao.UserDao;
+import com.example.investment.form.UserFrom;
 import com.example.investment.repository.UserRepository;
 
 @Service
@@ -13,14 +15,13 @@ public class UserService {
     UserRepository userRepository;
 
     /** ユーザ作成 */
-    public Boolean create(String userName, String mailaddress, String password){
-        if (userRepository.findByMailaddressInt(mailaddress) != null) {
+    public Boolean create(UserFrom userFrom){
+        if (userRepository.findByMailaddressInt(userFrom.getMailaddress()) != null) {
             return false;
         }
         UserDao userDao = new UserDao();
-        userDao.setUserName(userName);
-        userDao.setMailaddress(mailaddress);
-        userDao.setPassword(new Pbkdf2PasswordEncoder().encode(password));
+        BeanUtils.copyProperties(userFrom, userDao);
+        userDao.setPassword(new Pbkdf2PasswordEncoder().encode(userFrom.getPassword()));
         userDao.addTodoDao();
         userRepository.save(userDao);
         return true;

@@ -11,13 +11,15 @@
     <div class="error">
       <a th:text="${error}">
     </div>
-    <form action="users/create" method="POST">
+    <form action="users/create" th:object="${UserForm}" method="POST">
       <div class="name">お名前</div>
       <div class="div"><input type="text" name="userName" class="text-form1" oninput="nameCheck(this)" required></div>
       <div class="mailaddress">メールアドレス</div>
       <div class="div"><input type="email" name="mailaddress" class="text-form1" required></div>
       <div class="password">パスワード</div>
       <div class="div"><input type="password" name="password" class="text-form1" oninput="passwordCheck(this)" required></div>
+      <div class="money">所持金</div>
+      <div class="div"><input type="text" name="money" class="text-form1" oninput="moneyCheck(this)" required></div>
       <button type="button" class="buttonBase button1" onclick="location.href='/login'">戻る</button>
       <button class="buttonBase button2">登録</button>
     </form>

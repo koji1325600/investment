@@ -50,8 +50,16 @@ public class InvestmentController {
     @GetMapping(path = "home")
     String todo(Model model) {
         List<InvestmentDao> investList = investmentRepository.findByList();
-        model.addAttribute("investList", investList);
-        return "Invest/InvestHome";
+        try {
+            String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+            String userName = userRepository.findById(userId).get().getUserName();
+
+            model.addAttribute("userName", userName);
+            model.addAttribute("investList", investList);
+            return "Invest/InvestHome";
+        } catch (Exception e) {
+            return "redirect:/login";
+        }
     }
 
     /** 取引新規作成画面遷移 */

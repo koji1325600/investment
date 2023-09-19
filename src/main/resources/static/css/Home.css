@@ -13,6 +13,24 @@ table{
     background-color: #eee
   }
 
+  .button {
+    appearance: none;
+    border: 0;
+    border-radius: 5px;
+    color: #fff;
+    background: #4676D7;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background: #1d49aa;
+  }
+  
+  .button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px #cbd6ee;
+  }
+
   .buttonBase {
     appearance: none;
     border: 0;
@@ -40,6 +58,16 @@ table{
     text-align: center;
   }
 
+  .button2 {
+    margin-right: 15px;
+    background: #696969;
+  }
+
   .center {
     text-align: center;
+  }
+
+  .div {
+    text-align: right;
+    margin-top: -70px;
   }

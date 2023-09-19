@@ -9,6 +9,15 @@
 <script src="../../js/TodoCheck.js"></script>
 <body>
   <h2>取引一覧</h2>
+  <div class="div">
+    <a th:text="${userName}"></a>さん、ようこそ。
+    <form action="../invest/create" method="GET">
+      <button class="button button2">新規取引作成</button>
+    </form>
+    <form action="../logout" method="GET">
+      <button class="button button2">ログアウト</button>
+    </form>
+  </div>
   <table>
     <tr style="background-color: #a9a9a9">
       <th>商品名</th>

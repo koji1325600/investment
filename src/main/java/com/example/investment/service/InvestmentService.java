@@ -81,21 +81,15 @@ public class InvestmentService {
             }
         }
 
-        // 価格が最大価格より上にならないように
-        if (price > maxPrice) {
-            price = maxPrice;
-            List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
-
-            for (BuyingDao buyingDao: buyingList) {
-                UserDao userDao = userRepository.findById(buyingDao.getUserId()).get();
-                int money = buyingDao.getQuantity() * investDao.getMaxPrice();
-                userDao.setMoney(userDao.getMoney() + money);
-                userRepository.save(userDao);
-                buyingRepository.delete(buyingDao);
-            }
+        // 価格が最大価格より上の場合、ペナルティ
+        if (price - maxPrice > rangePrice) {
+            investDao.setCondit("絶不調");
+        } else if (price - maxPrice > minRangePrice) {
+            investDao.setCondit("不調");
+        } else {
+            updateCondition(investDao);
         }
         investDao.setPrice(price);
-        updateCondition(investDao);
         System.out.println(" set:" + price + " " + investDao.getCondit());
         return investDao;
     }

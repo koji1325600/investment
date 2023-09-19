@@ -41,6 +41,10 @@ public class InvestmentDao implements Serializable {
     @Column
     private int crash;
 
+    /** 調子 */
+    @Column
+    private String condit;
+
     /**
      * デフォルトコンストラクタ。
      */

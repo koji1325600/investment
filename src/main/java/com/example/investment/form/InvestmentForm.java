@@ -21,4 +21,7 @@ public class InvestmentForm {
 
     /** 暴落設定 */
     private int crash;
+
+    /** 調子 */
+    private String condit;
 }

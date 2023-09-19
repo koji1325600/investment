@@ -41,7 +41,7 @@ public class InvestmentController {
     InvestmentService investmentService;
 
     /** 価格変動タスク */
-    @Scheduled(initialDelay = 10000, fixedRate = 3000)
+    @Scheduled(initialDelay = 10000, fixedRate = 10000)
     public void priceFluctuation(){
         investmentService.fluctuation();
     }

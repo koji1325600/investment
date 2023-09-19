@@ -35,6 +35,7 @@ public class InvestmentService {
     public void addInvent(InvestmentForm investmentForm) {
         InvestmentDao investmentDao = new InvestmentDao();
         BeanUtils.copyProperties(investmentForm, investmentDao);
+        investmentDao.setCondit("普通");
         investmentDao.addTodoDao();
         investmentRepository.save(investmentDao);
     }
@@ -55,17 +56,17 @@ public class InvestmentService {
         int maxPrice = investDao.getMaxPrice();
         int minPrice = investDao.getMinPrice();
         int rangePrice = (maxPrice - minPrice) / 2;
+        int condition = rangePrice * condition(investDao.getCondit()) / 100;
         int minRangePrice = rangePrice / 2;
         int price = investDao.getPrice();
 
         if (price == 0) {
-            price = rand.nextInt(rangePrice) + (minPrice + minRangePrice);
+            price = rand.nextInt(rangePrice) + (minPrice + minRangePrice + condition);
         } else {
-            price = rand.nextInt(rangePrice) + (price - minRangePrice);
+            price = rand.nextInt(rangePrice) + (price - minRangePrice + condition);
         }
 
-        System.out.print(investDao.getName());
-        System.out.print(" rand:" + price);
+        System.out.print(investDao.getName() + " " + investDao.getCondit() + " rand:" + price);
         if (price < investDao.getCrash()) {
             System.out.print(" 暴落");
             price = rand.nextInt(rangePrice) + (minPrice + minRangePrice);
@@ -93,9 +94,45 @@ public class InvestmentService {
                 buyingRepository.delete(buyingDao);
             }
         }
-        System.out.println(" set:" + price);
         investDao.setPrice(price);
+        updateCondition(investDao);
+        System.out.println(" set:" + price + " " + investDao.getCondit());
         return investDao;
+    }
+
+    /** 調子判定処理 */
+    public int condition(String condit) {
+        int conditNum;
+        switch(condit) {
+            case "絶好調": conditNum = 20; break;
+            case "好調": conditNum = 10; break;
+            case "普通": conditNum = 0; break;
+            case "絶不調": conditNum = -10; break;
+            case "不調": conditNum = -20; break;
+            default: conditNum = 0; break;
+        }
+        return conditNum;
+    }
+
+    /** 調子設定処理 */
+    public void updateCondition(InvestmentDao investDao) {
+        Random rand = new Random();
+        int random = rand.nextInt(40) + 1;
+        String condit = investDao.getCondit();
+
+        if (random < 2) {
+            condit = "絶好調";
+        } else if (random < 5) {
+            condit = "好調";
+        } else if (random < 11) {
+            condit = "普通";
+        } else if (random < 14) {
+            condit = "不調";
+        } else if (random < 15) {
+            condit = "絶不調";
+        }
+
+        investDao.setCondit(condit);
     }
 
     /** 購入処理 */
@@ -136,13 +173,20 @@ public class InvestmentService {
         UserDao userDao = userRepository.findById(userId).get();
         BuyingDao buyingDao = buyingRepository.findByInvestIdAndUserIdDao(id, userId);
 
-        if (quantity > buyingDao.getQuantity()) {
-            return;
-        } else if (quantity == buyingDao.getQuantity()) {
-            buyingRepository.delete(buyingDao);
-        } else {
-            buyingDao.setQuantity(buyingDao.getQuantity() - quantity);
-            buyingRepository.save(buyingDao);
+        try {
+            if (quantity > buyingDao.getQuantity()) {
+                return;
+            } else if (quantity == buyingDao.getQuantity()) {
+                buyingRepository.delete(buyingDao);
+            } else {
+                buyingDao.setQuantity(buyingDao.getQuantity() - quantity);
+                buyingRepository.save(buyingDao);
+            }
+        } catch (Exception e) {
+            System.out.println("例外発生!!");
+            int money = quantity * investDao.getPrice();
+            userDao.setMoney(userDao.getMoney() + money);
+            userRepository.save(userDao);
         }
 
         int money = quantity * investDao.getPrice();

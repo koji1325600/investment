@@ -43,15 +43,23 @@ public class InvestmentService {
     /** 価格変動処理 */
     public void fluctuation() {
         List<InvestmentDao> investList = investmentRepository.findByList();
+        int totalPrice = 0;
 
         for (InvestmentDao investDao: investList) {
-            investmentRepository.save(randomPrice(investDao));
+            if ("インデックス".equals(investDao.getName())) {
+                investDao.setPrice(totalPrice / (investList.size() - 1));
+                investmentRepository.save(investDao);
+                System.out.println("インデックス:" + investDao.getPrice()); 
+            } else {
+                investmentRepository.save(randomPrice(investDao, investList.indexOf(investDao)));
+                totalPrice += investDao.getPrice();
+            }
         }
         System.out.println();
     }
 
     /** 価格乱数処理 */
-    public InvestmentDao randomPrice(InvestmentDao investDao) {
+    public InvestmentDao randomPrice(InvestmentDao investDao, int index) {
         Random rand = new Random();
         int maxPrice = investDao.getMaxPrice();
         int minPrice = investDao.getMinPrice();
@@ -59,6 +67,7 @@ public class InvestmentService {
         int condition = rangePrice * condition(investDao.getCondit()) / 100;
         int minRangePrice = rangePrice / 2;
         int price = investDao.getPrice();
+        int change = 0;
 
         if (price == 0) {
             price = rand.nextInt(rangePrice) + (minPrice + minRangePrice + condition);
@@ -70,6 +79,10 @@ public class InvestmentService {
         if (price < investDao.getCrash()) {
             System.out.print(" 暴落");
             price = rand.nextInt(rangePrice) + (minPrice + minRangePrice);
+            investDao.setMaxPrice(maxPrice - minRangePrice);
+            investDao.setMinPrice(minPrice - minRangePrice / 2);
+            investDao.setCrash(investDao.getCrash() - minRangePrice / 2);
+            change -= minRangePrice;
             List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
 
             for (BuyingDao buyingDao: buyingList) {
@@ -82,15 +95,20 @@ public class InvestmentService {
         }
 
         // 価格が最大価格より上の場合、ペナルティ
-        if (price - maxPrice > rangePrice) {
-            investDao.setCondit("絶不調");
-        } else if (price - maxPrice > minRangePrice) {
+        if (price - maxPrice > minRangePrice) {
             investDao.setCondit("不調");
+            investDao.setMaxPrice(maxPrice + minRangePrice);
+            investDao.setMinPrice(minPrice + minRangePrice / 2);
+            investDao.setCrash(investDao.getCrash() + minRangePrice / 2);
+            change += minRangePrice;
         } else {
             updateCondition(investDao);
         }
         investDao.setPrice(price);
-        System.out.println(" set:" + price + " " + investDao.getCondit());
+        System.out.print(" set:" + price + " " + investDao.getCondit() + " " + change + "     ");
+        if (index % 2 == 1) {
+            System.out.println();
+        }
         return investDao;
     }
 
@@ -116,9 +134,9 @@ public class InvestmentService {
 
         if (random < 2) {
             condit = "絶好調";
-        } else if (random < 5) {
+        } else if (random < 7) {
             condit = "好調";
-        } else if (random < 11) {
+        } else if (random < 12) {
             condit = "普通";
         } else if (random < 14) {
             condit = "不調";

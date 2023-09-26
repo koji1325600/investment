@@ -83,6 +83,7 @@ public class InvestmentService {
             investDao.setMinPrice(minPrice - minRangePrice / 2);
             investDao.setCrash(investDao.getCrash() - minRangePrice / 2);
             change -= minRangePrice;
+            investDao.setCondit("普通");
             List<BuyingDao> buyingList = buyingRepository.findByInvestIdList(investDao.getId());
 
             for (BuyingDao buyingDao: buyingList) {

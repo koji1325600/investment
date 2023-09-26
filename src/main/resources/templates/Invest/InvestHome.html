@@ -35,7 +35,7 @@
  // ▼上記のグラフを描画するための記述
  window.onload = function(){
     var ctx = document.getElementById("graph-area").getContext("2d");
-    window.myLine = new Chart(ctx).Line(lineChartData);
+    window.myLine = new Chart(ctx).Line(lineChartData, {responsive : true});
  }
 </script>
 <body>

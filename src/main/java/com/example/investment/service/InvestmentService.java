@@ -64,6 +64,7 @@ public class InvestmentService {
                 totalPrice += investDao.getPrice();
             }
         }
+        deleteInvestLog();
         System.out.println();
     }
 
@@ -82,6 +83,17 @@ public class InvestmentService {
         investLogDao.addTodoDao();
 
         investLogRepository.save(investLogDao);
+    }
+
+    /** 容量を超えたログを削除する。 */
+    public void deleteInvestLog() {
+        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestDaoOrderByDateList();
+        int size = investLogDaoList.size();
+        if (size > 500) {
+            for (int i = 499; i < size - 1; i++) {
+                investLogRepository.delete(investLogDaoList.get(i));
+            }
+        }
     }
 
     /** 価格乱数処理 */

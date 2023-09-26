@@ -1,5 +1,7 @@
 package com.example.investment.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
@@ -10,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.investment.dao.BuyingDao;
+import com.example.investment.dao.InvestLogDao;
 import com.example.investment.dao.InvestmentDao;
 import com.example.investment.dao.UserDao;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
+import com.example.investment.repository.InvestLogRepository;
 import com.example.investment.repository.InvestmentRepository;
 import com.example.investment.repository.UserRepository;
 
@@ -30,6 +34,9 @@ public class InvestmentService {
 
     @Autowired
     BuyingRepository buyingRepository;
+
+    @Autowired
+    InvestLogRepository investLogRepository;
 
     /** 取引追加処理 */
     public void addInvent(InvestmentForm investmentForm) {
@@ -49,13 +56,32 @@ public class InvestmentService {
             if ("インデックス".equals(investDao.getName())) {
                 investDao.setPrice(totalPrice / (investList.size() - 1));
                 investmentRepository.save(investDao);
+                addInvestLog(investDao);
                 System.out.println("インデックス:" + investDao.getPrice()); 
             } else {
                 investmentRepository.save(randomPrice(investDao, investList.indexOf(investDao)));
+                addInvestLog(investDao);
                 totalPrice += investDao.getPrice();
             }
         }
         System.out.println();
+    }
+
+    /** 取引価格変動ログ追加 */
+    public void addInvestLog(InvestmentDao investDao) {
+        //DateTimeFormatterクラスのオブジェクトを生成する
+    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime nowDefaltDate = LocalDateTime.now();
+        LocalDateTime nowDateTime = LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
+        InvestLogDao investLogDao = new InvestLogDao();
+
+        investLogDao.setInvestId(investDao.getId());
+        investLogDao.setInvestName(investDao.getName());
+        investLogDao.setPrice(investDao.getPrice());
+        investLogDao.setDate(nowDateTime);
+        investLogDao.addTodoDao();
+
+        investLogRepository.save(investLogDao);
     }
 
     /** 価格乱数処理 */

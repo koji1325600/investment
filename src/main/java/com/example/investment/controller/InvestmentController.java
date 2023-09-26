@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.investment.dao.BuyingDao;
 import com.example.investment.dao.InvestmentDao;
+import com.example.investment.dao.InvestLogDao;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
+import com.example.investment.repository.InvestLogRepository;
 import com.example.investment.repository.InvestmentRepository;
 import com.example.investment.repository.UserRepository;
 import com.example.investment.service.InvestmentService;
@@ -38,10 +40,13 @@ public class InvestmentController {
     BuyingRepository buyingRepository;
 
     @Autowired
+    InvestLogRepository investLogRepository;
+
+    @Autowired
     InvestmentService investmentService;
 
     /** 価格変動タスク */
-    @Scheduled(initialDelay = 10000, fixedRate = 10000)
+    @Scheduled(initialDelay = 10000, fixedRate = 3000)
     public void priceFluctuation(){
         investmentService.fluctuation();
     }
@@ -51,11 +56,13 @@ public class InvestmentController {
     String todo(Model model) {
         List<InvestmentDao> investList = investmentRepository.findByList();
         try {
+            List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestDaoOrderByInvestNameList();
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
 
             model.addAttribute("userName", userName);
             model.addAttribute("investList", investList);
+            model.addAttribute("investLogList", investLogDaoList);
             return "Invest/InvestHome";
         } catch (Exception e) {
             return "redirect:/login";

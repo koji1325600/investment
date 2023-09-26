@@ -53,11 +53,11 @@ public class InvestmentService {
         int totalPrice = 0;
 
         for (InvestmentDao investDao: investList) {
-            if ("インデックス".equals(investDao.getName())) {
+            if ("アベレージ".equals(investDao.getName())) {
                 investDao.setPrice(totalPrice / (investList.size() - 1));
                 investmentRepository.save(investDao);
                 addInvestLog(investDao);
-                System.out.println("インデックス:" + investDao.getPrice()); 
+                System.out.println("アベレージ:" + investDao.getPrice()); 
             } else {
                 investmentRepository.save(randomPrice(investDao, investList.indexOf(investDao)));
                 addInvestLog(investDao);
@@ -87,10 +87,10 @@ public class InvestmentService {
 
     /** 容量を超えたログを削除する。 */
     public void deleteInvestLog() {
-        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestDaoOrderByDateList();
+        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
         int size = investLogDaoList.size();
-        if (size > 500) {
-            for (int i = 499; i < size - 1; i++) {
+        if (size > 300) {
+            for (int i = 299; i < size - 1; i++) {
                 investLogRepository.delete(investLogDaoList.get(i));
             }
         }

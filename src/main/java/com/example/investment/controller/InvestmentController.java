@@ -70,9 +70,10 @@ public class InvestmentController {
     }
 
     @GetMapping(path = "reHome")
-    String reHome(@RequestParam String investName1, String investName2, Model model){
+    String reHome(@RequestParam String investName1, String investName2, String graphType, Model model){
         model.addAttribute("investName1", investName1);
         model.addAttribute("investName2", investName2);
+        model.addAttribute("graphType", graphType);
         return home(model);
     }
 

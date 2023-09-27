@@ -15,13 +15,20 @@ setTimeout(function () {
   hiddenField2.name = 'investName2';
   hiddenField2.value = params2;
 
+  const params3 = document.getElementById("graphType").value;
+  const hiddenField3 = document.createElement('input');
+  hiddenField3.type = 'hidden';
+  hiddenField3.name = 'graphType';
+  hiddenField3.value = params3;
+
   form.appendChild(hiddenField1);
   form.appendChild(hiddenField2);
+  form.appendChild(hiddenField3);
   document.body.appendChild(form);
   form.submit();
 }, 5000);
 
-function createGraphDate(investLogDaoList, investName1, investName2) {
+function createLineGraphDate(investLogDaoList, investName1, investName2) {
   var averageLogList = investLogDaoList.filter(investLog => {
     return investLog.investName == "アベレージ";
   });
@@ -88,4 +95,31 @@ function createGraphDate(investLogDaoList, investName1, investName2) {
     }
  }
  return lineChartData;
+}
+
+function createPieGraphDate(investmentList) {
+  var investList = investmentList.filter(invest => {
+    return invest.name != "アベレージ";
+  });
+
+  var investNameList = investList.map(function( value ) {
+    return value.name;
+  });
+
+  var investPriceList = investList.map(function( value ) {
+    return value.price;
+  });
+  // ▼グラフの中身
+  var pieChartData = {
+    type: 'pie',
+    data: {
+      labels: investNameList,
+      datasets: [{
+        data: investPriceList,
+        backgroundColor: ['#FF5192', '#FF5F17', '#7B3CFF','#2C7CFF','#32EEFF','#C9FF2F','#30F9B2','#2DFF57','#808080'],
+        weight: 100,
+      }],
+    }
+  }
+  return pieChartData;
 }

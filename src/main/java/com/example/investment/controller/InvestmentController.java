@@ -53,7 +53,7 @@ public class InvestmentController {
 
     /** ホーム画面に遷移する */
     @GetMapping(path = "home")
-    String todo(Model model) {
+    String home(Model model) {
         List<InvestmentDao> investList = investmentRepository.findByList();
         List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
         try {
@@ -67,6 +67,13 @@ public class InvestmentController {
         } catch (Exception e) {
             return "redirect:/login";
         }
+    }
+
+    @GetMapping(path = "reHome")
+    String reHome(@RequestParam String investName1, String investName2, Model model){
+        model.addAttribute("investName1", investName1);
+        model.addAttribute("investName2", investName2);
+        return home(model);
     }
 
     /** 取引新規作成画面遷移 */

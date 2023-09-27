@@ -1,16 +1,35 @@
 setTimeout(function () {
-    location.reload();
+  const form = document.createElement('form');
+  form.method = 'get';
+  form.action = 'reHome';
+
+  const params1 = document.getElementById("investName1").value;
+  const hiddenField1 = document.createElement('input');
+  hiddenField1.type = 'hidden';
+  hiddenField1.name = 'investName1';
+  hiddenField1.value = params1;
+
+  const params2 = document.getElementById("investName2").value;
+  const hiddenField2 = document.createElement('input');
+  hiddenField2.type = 'hidden';
+  hiddenField2.name = 'investName2';
+  hiddenField2.value = params2;
+
+  form.appendChild(hiddenField1);
+  form.appendChild(hiddenField2);
+  document.body.appendChild(form);
+  form.submit();
 }, 5000);
 
-function createGraphDate(investLogDaoList) {
+function createGraphDate(investLogDaoList, investName1, investName2) {
   var averageLogList = investLogDaoList.filter(investLog => {
     return investLog.investName == "アベレージ";
   });
   var logList1 = investLogDaoList.filter(investLog => {
-    return investLog.investName == "ドリアン";
+    return investLog.investName == investName1;
   });
   var logList2 = investLogDaoList.filter(investLog => {
-    return investLog.investName == "メロン";
+    return investLog.investName == investName2;
   });
 
   var averagePriceList = averageLogList.map(function( value ) {
@@ -27,7 +46,6 @@ function createGraphDate(investLogDaoList) {
     return "";
   });
 
-  console.log(averagePriceList);
   // ▼グラフの中身
   var lineChartData = {
     type: 'line',
@@ -45,7 +63,7 @@ function createGraphDate(investLogDaoList) {
             data : averagePriceList       // 各点の値
         },
         {
-            label: "ドリアン",
+            label: investName1,
             backgroundColor : "rgba(60,160,220,0.3)",
             borderColor : "rgba(60,160,220,1)",
             pointColor : "rgba(60,160,220,1)",
@@ -55,7 +73,7 @@ function createGraphDate(investLogDaoList) {
             data : priceList1
         },
         {
-            label: "メロン",
+            label: investName2,
             backgroundColor : "rgba(255,29,58,0.3)",
             borderColor : "rgba(220,60,60,1)",
             pointColor : "rgba(220,60,60,1)",

@@ -10,11 +10,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
   var investLogDaoList = /*[[${investLogDaoList}]]*/"investLogDaoList";
+  var investName1 = /*[[${investName1}]]*/"investName1";
+  var investName2 = /*[[${investName2}]]*/"investName2";
 
   // ▼上記のグラフを描画するための記述
   window.onload = function(){
+    let options1= document.getElementById('investName1').options;
+    let options2= document.getElementById('investName2').options;
+    for (let option of options1) {
+      if(option.value === investName1) option.selected = true;
+    }
+    for (let option of options2) {
+      if(option.value === investName2) option.selected = true;
+    }
     var ctx = document.getElementById("graph-area").getContext("2d");
-    window.myLine = new Chart(ctx, createGraphDate(investLogDaoList));
+    window.myLine = new Chart(ctx, createGraphDate(investLogDaoList, investName1, investName2));
  }
 </script>
 <body>
@@ -38,11 +48,23 @@
       <td><a th:text="${invest.price}"></a></td>
     </tr>
   </table>
+  <div class="mt1">
+    <select id="investName1">
+      <option value=""></option>
+      <tr th:each="invest : ${investList}">
+        <option th:value="${invest.name}"><a th:text="${invest.name}"></a></option>
+      </tr>
+    </select>
+    <select id="investName2">
+      <option value=""></option>
+      <tr th:each="invest : ${investList}">
+        <option th:value="${invest.name}"><a th:text="${invest.name}"></a></option>
+      </tr>
+    </select>
+    <canvas id="graph-area" class="graph-area"></canvas>
+  </div>
   <div class="center">
     <button class="buttonBase button1" onClick="window.open('http://localhost:8080/invest/buying','_blank')">売買画面表示</button>
-  </div>
-  <div class="mt1">
-    <canvas id="graph-area" class="graph-area"></canvas>
   </div>
 </body>
 </html>

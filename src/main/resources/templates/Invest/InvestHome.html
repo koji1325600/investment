@@ -7,35 +7,14 @@
 </head>
 <script src="../../js/Home.js"></script>
 <script src="../../js/TodoCheck.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
   var investLogDaoList = /*[[${investLogDaoList}]]*/"investLogDaoList";
-  var investPriceList = investLogDaoList.map(function( value ) {
-    return value.price;
-  })
-  console.log(investPriceList);
-  // ▼グラフの中身
-  var lineChartData = {
-    labels : ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],
-    datasets : [
-       {
-          label: "アベレージ",
-          fillColor : "rgba(92,220,92,0.2)", // 線から下端までを塗りつぶす色
-          strokeColor : "rgba(92,220,92,1)", // 折れ線の色
-          pointColor : "rgba(92,220,92,1)",  // ドットの塗りつぶし色
-          pointStrokeColor : "white",        // ドットの枠線色
-          pointHighlightFill : "yellow",     // マウスが載った際のドットの塗りつぶし色
-          pointHighlightStroke : "green",    // マウスが載った際のドットの枠線色
-          data : investPriceList       // 各点の値
-       }
-    ]
 
- }
-
- // ▼上記のグラフを描画するための記述
- window.onload = function(){
+  // ▼上記のグラフを描画するための記述
+  window.onload = function(){
     var ctx = document.getElementById("graph-area").getContext("2d");
-    window.myLine = new Chart(ctx).Line(lineChartData, {responsive : true});
+    window.myLine = new Chart(ctx, createGraphDate(investLogDaoList));
  }
 </script>
 <body>

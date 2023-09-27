@@ -55,18 +55,14 @@ public class InvestmentController {
     @GetMapping(path = "home")
     String todo(Model model) {
         List<InvestmentDao> investList = investmentRepository.findByList();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList("ffffffff-ffff-ffff-ffff-ffffffffffff");
-        //最新ログ30個取得
-        int size = investLogDaoList.size() - 1;
-        int index = size - 30;
-        List<InvestLogDao> reInvestLogDaoList = investLogDaoList.subList(index, size);
+        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
         try {
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
 
             model.addAttribute("userName", userName);
             model.addAttribute("investList", investList);
-            model.addAttribute("investLogDaoList", reInvestLogDaoList);
+            model.addAttribute("investLogDaoList", investLogDaoList);
             return "Invest/InvestHome";
         } catch (Exception e) {
             return "redirect:/login";

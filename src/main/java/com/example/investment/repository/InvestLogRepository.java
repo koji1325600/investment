@@ -13,8 +13,12 @@ public interface InvestLogRepository extends JpaRepository<InvestLogDao, String>
     @Query("SELECT X FROM InvestLogDao X ORDER BY X.investId")
     List<InvestLogDao> findOrderByInvestIdList();
 
-    /** 全売買情報ログリスト取得 日時ソート*/
+    /** 全売買情報ログリスト取得 日時ソート 降順*/
     @Query("SELECT X FROM InvestLogDao X ORDER BY X.date DESC")
+    List<InvestLogDao> findOrderByDateDescList();
+
+    /** 全売買情報ログリスト取得 日時ソート*/
+    @Query("SELECT X FROM InvestLogDao X ORDER BY X.date")
     List<InvestLogDao> findOrderByDateList();
 
     /** 全売買情報ログリスト取得 日時ソート*/

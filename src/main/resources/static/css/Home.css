@@ -13,6 +13,11 @@ table{
     background-color: #eee
   }
 
+  .tr:hover {
+    background-color: #BAD3FF;
+    cursor: pointer;
+  }
+
   .button {
     appearance: none;
     border: 0;
@@ -73,10 +78,10 @@ table{
   }
 
   .mt1 {
-    margin-top: 50px;
+    margin-top: 25px;
   }
 
   .graph-area {
     width: 100%;
-    height: 350px;
+    height: 320px;
   }

@@ -20,15 +20,9 @@
     let options1= document.getElementById('investName1').options;
     let options2= document.getElementById('investName2').options;
     let options3= document.getElementById('graphType').options;
-    for (let option of options1) {
-      if(option.value === investName1) option.selected = true;
-    }
-    for (let option of options2) {
-      if(option.value === investName2) option.selected = true;
-    }
-    for (let option of options3) {
-      if(option.value === graphType) option.selected = true;
-    }
+    selected(options1, investName1);
+    selected(options2, investName2);
+    selected(options3, graphType);
     var ctx = document.getElementById("graph-area").getContext("2d");
     if (graphType == null || graphType == "line") {
       window.myLine = new Chart(ctx, createLineGraphDate(investLogDaoList, investName1, investName2));
@@ -53,9 +47,9 @@
       <th>商品名</th>
       <th>価格</th>
     </tr>
-    <tr th:each="invest : ${investList}">
-      <td><a th:text="${invest.name}"></a></td>
-      <td><a th:text="${invest.price}"></a></td>
+    <tr class="tr" th:each="invest : ${investList}">
+      <td th:onclick="|action('__${invest.id}__')|"><a th:text="${invest.name}"></a></td>
+      <td th:onclick="|action('__${invest.id}__')|"><a th:text="${invest.price}"></a></td>
     </tr>
   </table>
   <div class="mt1">

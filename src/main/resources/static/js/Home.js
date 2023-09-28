@@ -28,6 +28,21 @@ setTimeout(function () {
   form.submit();
 }, 5000);
 
+function action(params) {
+  const form = document.createElement('form');
+  form.method = 'get';
+  form.action = 'detail';
+
+  const hiddenField = document.createElement('input');
+  hiddenField.type = 'hidden';
+  hiddenField.name = 'id';
+  hiddenField.value = params;
+
+  form.appendChild(hiddenField);
+  document.body.appendChild(form);
+  form.submit();
+}
+
 function createLineGraphDate(investLogDaoList, investName1, investName2) {
   var averageLogList = investLogDaoList.filter(investLog => {
     return investLog.investName == "アベレージ";
@@ -122,4 +137,10 @@ function createPieGraphDate(investmentList) {
     }
   }
   return pieChartData;
+}
+
+function selected(options, selectValue) {
+  for (let option of options) {
+    if(option.value === selectValue) option.selected = true;
+  }
 }

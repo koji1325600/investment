@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="..\static\css\Home.css" th:href="@{/css/Home.css}">
+  <title>取引詳細</title>
+</head>
+<script src="../../js/Detail.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+<script type="text/javascript" th:inline="javascript">
+  var investLogDaoList = /*[[${investLogDaoList}]]*/"investLogDaoList";
+  window.onload = function(){
+    var ctx = document.getElementById("graph-area").getContext("2d");
+    window.myLine = new Chart(ctx, createLineGraphDate(investLogDaoList));
+  }
+</script>
+<body>
+  <input type="hidden" id="investId" th:value="${investDao.id}">
+  <h2>取引詳細</h2>
+  <div class="div">
+    <a th:text="${userName}"></a>さん、ようこそ。
+    <form action="../invest/create" method="GET">
+      <button class="button button2">新規取引作成</button>
+    </form>
+    <form action="../logout" method="GET">
+      <button class="button button2">ログアウト</button>
+    </form>
+  </div>
+  <table>
+    <tr style="background-color: #a9a9a9">
+      <th>商品名　</th>
+      <th>最大価格</th>
+      <th>最小価格</th>
+    </tr>
+    <tr>
+      <td><a th:text="${investDao.name}"></a></td>
+      <td><a th:text="${investDao.maxPrice}"></a></td>
+      <td><a th:text="${investDao.minPrice}"></a></td>
+    </tr>
+  </table>
+  <table>
+    <tr style="background-color: #a9a9a9">
+      <th>価格　　</th>
+      <th>暴落設定</th>
+      <th>　調子　</th>
+    </tr>
+    <tr>
+      <td><a th:text="${investDao.price}"></a></td>
+      <td><a th:text="${investDao.crash}"></a></td>
+      <td><a th:text="${investDao.condit}"></a></td>
+    </tr>
+  </table>
+  <div class="mt1">
+    <canvas id="graph-area" class="graph-area"></canvas>
+  </div>
+  <div class="center">
+    <button class="buttonBase button1" onClick="location.href='home'">ホームに戻る</button>
+  </div>
+</body>
+</html>

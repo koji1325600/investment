@@ -87,10 +87,12 @@ public class InvestmentService {
 
     /** 容量を超えたログを削除する。 */
     public void deleteInvestLog() {
-        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
-        int size = investLogDaoList.size();
-        if (size > 300) {
-            for (int i = 299; i < size - 1; i++) {
+        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateDescList();
+        List<InvestmentDao> investmentDaoList = investmentRepository.findAll();
+        int logSize = investLogDaoList.size();
+        int investSize = investmentDaoList.size();
+        if (logSize > 300) {
+            for (int i = logSize - 1; i >= logSize - investSize; i--) {
                 investLogRepository.delete(investLogDaoList.get(i));
             }
         }

@@ -53,24 +53,28 @@ public class InvestmentController {
 
     /** ホーム画面に遷移する */
     @GetMapping(path = "home")
-    String todo(Model model) {
+    String home(Model model) {
         List<InvestmentDao> investList = investmentRepository.findByList();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList("ffffffff-ffff-ffff-ffff-ffffffffffff");
-        //最新ログ30個取得
-        int size = investLogDaoList.size() - 1;
-        int index = size - 30;
-        List<InvestLogDao> reInvestLogDaoList = investLogDaoList.subList(index, size);
+        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
         try {
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
 
             model.addAttribute("userName", userName);
             model.addAttribute("investList", investList);
-            model.addAttribute("investLogDaoList", reInvestLogDaoList);
+            model.addAttribute("investLogDaoList", investLogDaoList);
             return "Invest/InvestHome";
         } catch (Exception e) {
             return "redirect:/login";
         }
+    }
+
+    @GetMapping(path = "reHome")
+    String reHome(@RequestParam String investName1, String investName2, String graphType, Model model){
+        model.addAttribute("investName1", investName1);
+        model.addAttribute("investName2", investName2);
+        model.addAttribute("graphType", graphType);
+        return home(model);
     }
 
     /** 取引新規作成画面遷移 */
@@ -111,5 +115,19 @@ public class InvestmentController {
     String sellInvest(@RequestParam String id, int quantity, Model model) {
         investmentService.selling(id, quantity);
         return "redirect:buying";
+    }
+
+    /** 取引詳細画面遷移 */
+    @GetMapping(path = "detail")
+    String investDetail(@RequestParam String id, Model model){
+        InvestmentDao investDao = investmentRepository.findById(id).get();
+        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList(id);
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        String userName = userRepository.findById(userId).get().getUserName();
+        
+        model.addAttribute("userName", userName);
+        model.addAttribute("investDao", investDao);
+        model.addAttribute("investLogDaoList", investLogDaoList);
+        return "Invest/Detail";
     }
 }

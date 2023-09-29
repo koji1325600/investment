@@ -120,14 +120,18 @@ public class InvestmentController {
     /** 取引詳細画面遷移 */
     @GetMapping(path = "detail")
     String investDetail(@RequestParam String id, Model model){
-        InvestmentDao investDao = investmentRepository.findById(id).get();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList(id);
-        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        String userName = userRepository.findById(userId).get().getUserName();
-        
-        model.addAttribute("userName", userName);
-        model.addAttribute("investDao", investDao);
-        model.addAttribute("investLogDaoList", investLogDaoList);
-        return "Invest/Detail";
+        try {
+            InvestmentDao investDao = investmentRepository.findById(id).get();
+            List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList(id);
+            String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+            String userName = userRepository.findById(userId).get().getUserName();
+            
+            model.addAttribute("userName", userName);
+            model.addAttribute("investDao", investDao);
+            model.addAttribute("investLogDaoList", investLogDaoList);
+            return "Invest/Detail";
+        } catch (Exception e) {
+            return "redirect:/login";
+        }
     }
 }

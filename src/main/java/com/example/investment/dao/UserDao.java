@@ -38,6 +38,10 @@ public class UserDao implements Serializable {
     @Column
     private int money;
 
+    /** 自動取引設定 */
+    @Column
+    private Boolean auto;
+
     /**
      * デフォルトコンストラクタ。
      */

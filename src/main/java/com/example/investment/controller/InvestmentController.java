@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.investment.dao.BuyingDao;
 import com.example.investment.dao.InvestmentDao;
+import com.example.investment.dao.UserDao;
 import com.example.investment.dao.InvestLogDao;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
@@ -49,6 +50,17 @@ public class InvestmentController {
     @Scheduled(initialDelay = 10000, fixedRate = 3000)
     public void priceFluctuation(){
         investmentService.fluctuation();
+    }
+
+    /** 自動取引タスク */
+    @Scheduled(initialDelay = 11000, fixedRate = 3000)
+    public void autoInvestment(){
+        List<UserDao> userDaoList = userRepository.findAll();
+        for (UserDao userDao: userDaoList) {
+            if (userDao.getAuto() != null) {
+                investmentService.autoInvestment(userDao);
+            }
+        }      
     }
 
     /** ホーム画面に遷移する */
@@ -99,14 +111,16 @@ public class InvestmentController {
     
         model.addAttribute("investList", investList);
         model.addAttribute("buyList", buyList);
-        model.addAttribute("money", userRepository.findById(userId).get().getMoney());
+        model.addAttribute("userDao", userRepository.findById(userId).get());
         return "Invest/buying";
     }
 
     /** 取引購入 */
     @PostMapping(path = "buyInvest")
     String buyInvest(@RequestParam String id, int quantity, Model model) {
-        investmentService.buying(id, quantity);
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDao userDao = userRepository.findById(userId).get();
+        investmentService.buying(userDao, id, quantity);
         return "redirect:buying";
     }
 
@@ -133,5 +147,18 @@ public class InvestmentController {
         } catch (Exception e) {
             return "redirect:/login";
         }
+    }
+
+    @PostMapping(path = "auto")
+    String auto(@RequestParam String auto, Model model) {
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDao userDao = userRepository.findById(userId).get();
+        if ("true".equals(auto)) {
+            userDao.setAuto(true);
+        } else {
+            userDao.setAuto(null);
+        }
+        userRepository.save(userDao);
+        return "redirect:buying";
     }
 }

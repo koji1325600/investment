@@ -5,7 +5,18 @@
   <link rel="stylesheet" href="..\static\css\Home.css" th:href="@{/css/Home.css}">
   <title>売買</title>
 </head>
-<script src="../../js/TodoCheck.js"></script>
+<script src="../../js/Buying.js"></script>
+<script type="text/javascript" th:inline="javascript">
+  var userDao = /*[[${userDao}]]*/"userDao";
+  var auto = userDao.auto;
+  if (auto == null) {
+    auto = "false";
+  }
+  window.onload = function(){
+    let options= document.getElementById('auto').options;
+    selected(options, auto);
+  }
+</script>
 <body>
   <h2>売買</h2>
   <form action="buyInvest" method="POST">
@@ -17,8 +28,12 @@
     個数
     <input type="text" name="quantity">
     <button>購入</button>
-    <a th:text="${money}"></a>
+    <a th:text="${userDao.money}"></a>
   </form>
+  <select id="auto" name="auto">
+    <option value="true">自動取引ON</option>
+    <option value="false">自動取引OFF</option>
+  </select>
   <form action="sellInvest" method="POST">
     <select name="id">
       <tr th:each="buy : ${buyList}">

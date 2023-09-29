@@ -92,6 +92,9 @@ public class InvestmentService {
         int logSize = investLogDaoList.size();
         int investSize = investmentDaoList.size();
         if (logSize > 300) {
+            if (logSize > 300 + investSize) {
+                investSize = investSize * 2;
+            }
             for (int i = logSize - 1; i >= logSize - investSize; i--) {
                 investLogRepository.delete(investLogDaoList.get(i));
             }

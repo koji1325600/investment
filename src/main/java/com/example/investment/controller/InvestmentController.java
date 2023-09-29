@@ -127,7 +127,9 @@ public class InvestmentController {
     /** 取引売却 */
     @PostMapping(path = "sellInvest")
     String sellInvest(@RequestParam String id, int quantity, Model model) {
-        investmentService.selling(id, quantity);
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDao userDao = userRepository.findById(userId).get();
+        investmentService.selling(userDao, id, quantity);
         return "redirect:buying";
     }
 
@@ -149,6 +151,7 @@ public class InvestmentController {
         }
     }
 
+    /** 自動取引切り替え */
     @PostMapping(path = "auto")
     String auto(@RequestParam String auto, Model model) {
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();

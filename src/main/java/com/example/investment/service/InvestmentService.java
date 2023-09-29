@@ -235,10 +235,9 @@ public class InvestmentService {
     }
 
     /** 売却処理 */
-    public void selling(String id, int quantity) {
+    public void selling(UserDao userDao, String id, int quantity) {
         InvestmentDao investDao = investmentRepository.findById(id).get();
-        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        UserDao userDao = userRepository.findById(userId).get();
+        String userId = userDao.getUserId();
         BuyingDao buyingDao = buyingRepository.findByInvestIdAndUserIdDao(id, userId);
 
         try {
@@ -256,6 +255,7 @@ public class InvestmentService {
             int money = quantity * investDao.getPrice();
             userDao.setMoney(userDao.getMoney() + money);
             userRepository.save(userDao);
+            return;
         }
 
         //所持金に合計売却価格を足す
@@ -269,13 +269,26 @@ public class InvestmentService {
         List<InvestmentDao> investDaoList = investmentRepository.findAll();
         int count;
         
-        for (InvestmentDao investDao: investDaoList) {
-            if ("絶不調".equals(investDao.getCondit()) || "不調".equals(investDao.getCondit()) || "アベレージ".equals(investDao.getName())) {
+        if (rand() == 0) {
+            for (InvestmentDao investDao: investDaoList) {
+                if ("絶不調".equals(investDao.getCondit()) || "不調".equals(investDao.getCondit()) || "アベレージ".equals(investDao.getName())) {
+                    continue;
+                }
+                count = buyCheck(investDao, userDao.getMoney());
+                if (count > 0) {
+                    buying(userDao, investDao.getId(), count);
+                }
+            }
+        }
+        List<BuyingDao> buyingDaoList = buyingRepository.findByUserIdList(userDao.getUserId());
+
+        for (BuyingDao buyingDao: buyingDaoList) {
+            InvestmentDao investDao = investmentRepository.findById(buyingDao.getInvestId()).get();
+            if ("絶好調".equals(investDao.getCondit()) || "好調".equals(investDao.getCondit()) || "アベレージ".equals(investDao.getName())) {
                 continue;
             }
-            count = buyCheck(investDao, userDao.getMoney());
-            if (count > 0) {
-                buying(userDao, investDao.getId(), count);
+            if (sellCheck(investDao)) {
+                selling(userDao, investDao.getId(), buyingDao.getQuantity());
             }
         }
     }
@@ -290,24 +303,48 @@ public class InvestmentService {
         int price = investDao.getPrice();
         String condit = investDao.getCondit();
 
-        if (price < minPrice + rangePrice) {
-            count++;
-        }
         if (minPrice + minRangePrice < price && price < minPrice + rangePrice) {
-            count++;
+            count += rand();
         }
         if ("好調".equals(condit)) {
             count++;
         }
         if ("絶好調".equals(condit)) {
-            count += 2;
+            count += rand();
         }
         if (count > 0 && money > price * 10) {
-            count++;
-            if (money > price * 20) {
-                count++;
-            }
+            count += rand() + 1;
         }
         return count;
+    }
+
+    /** 自動売却チェック */
+    public boolean sellCheck(InvestmentDao investDao) {
+        boolean flg = false;
+        int maxPrice = investDao.getMaxPrice();
+        int minPrice = investDao.getMinPrice();
+        int rangePrice = (maxPrice - minPrice) / 2;
+        int minRangePrice = rangePrice / 2;
+        int price = investDao.getPrice();
+        String condit = investDao.getCondit();
+
+        if ("絶不調".equals(condit)) {
+            flg = true;
+        }
+        if (price > maxPrice - minRangePrice) {
+            flg = true;
+        }
+        if ("不調".equals(condit) && price > minPrice + rangePrice) {
+            flg = true;
+        }
+        
+        return flg;
+    }
+
+    /** 乱数処理 */
+    public int rand() {
+        Random rand = new Random();
+        int random = rand.nextInt(3);
+        return random;
     }
 }

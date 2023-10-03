@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.investment.dao.UserDao;
+import com.example.investment.dto.UserDto;
 import com.example.investment.form.UserFrom;
 import com.example.investment.repository.UserRepository;
 
@@ -19,11 +19,11 @@ public class UserService {
         if (userRepository.findByMailaddressInt(userFrom.getMailaddress()) != null) {
             return false;
         }
-        UserDao userDao = new UserDao();
-        BeanUtils.copyProperties(userFrom, userDao);
-        userDao.setPassword(new Pbkdf2PasswordEncoder().encode(userFrom.getPassword()));
-        userDao.addTodoDao();
-        userRepository.save(userDao);
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userFrom, userDto);
+        userDto.setPassword(new Pbkdf2PasswordEncoder().encode(userFrom.getPassword()));
+        userDto.addTodoDto();
+        userRepository.save(userDto);
         return true;
     }
 
@@ -33,9 +33,9 @@ public class UserService {
     }
 
     /** ユーザ更新処理 */
-    public void updateUser(String id, UserDao userDao){
+    public void updateUser(String id, UserDto userDto){
         //removeUser(id);
-        userRepository.save(userDao);
+        userRepository.save(userDto);
     }
     
 }

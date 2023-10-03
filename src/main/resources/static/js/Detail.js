@@ -13,13 +13,13 @@ setTimeout(function () {
     document.body.appendChild(form);
     form.submit();
   }, 5000);
-function createLineGraphDate(investLogDaoList) {
-    var investName = investLogDaoList[0].investName;
-    var investPriceList = investLogDaoList.map(function( value ) {
+function createLineGraphDate(investLogDtoList) {
+    var investName = investLogDtoList[0].investName;
+    var investPriceList = investLogDtoList.map(function( value ) {
       return value.price;
     });
   
-    var investNameList = investLogDaoList.map(function() {
+    var investNameList = investLogDtoList.map(function() {
       return "";
     });
   

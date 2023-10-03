@@ -1,4 +1,4 @@
-package com.example.investment.dao;
+package com.example.investment.dto;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -12,8 +12,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="buying")
-public class BuyingDao implements Serializable {
+@Table(name="investment")
+public class InvestmentDto implements Serializable {
     /** デフォルトシリアルUID */
     private static final long serialVersionUID = 1L;
 
@@ -21,34 +21,34 @@ public class BuyingDao implements Serializable {
     @Id
     private String id;
 
-    /** 取引ID */
+    /** 名前 */
     @Column
-    private String investId;
+    private String name;
 
-    /** ユーザID */
+    /** 最大価格 */
+    @Column(name="max_price")
+    private int maxPrice;
+
+    /** 最小価格 */
+    @Column(name="min_price")
+    private int minPrice;
+
+    /** 価格 */
     @Column
-    private String userId;
+    private int price;
 
-    /** 取引名 */
+    /** 暴落設定 */
     @Column
-    private String investName;
+    private int crash;
 
-    /** ユーザ名 */
+    /** 調子 */
     @Column
-    private String userName;
-
-    /** 個数 */
-    @Column
-    private int quantity;
-
-    /** 購入価格 */
-    @Column(name="buy_price")
-    private int buyPrice;
+    private String condit;
 
     /**
      * デフォルトコンストラクタ。
      */
-    public void addTodoDao() {
+    public void addTodoDto() {
         this.id = UUID.randomUUID().toString();
     }
 }

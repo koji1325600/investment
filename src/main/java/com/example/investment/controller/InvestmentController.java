@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.investment.dao.BuyingDao;
-import com.example.investment.dao.InvestmentDao;
-import com.example.investment.dao.UserDao;
-import com.example.investment.dao.InvestLogDao;
+import com.example.investment.dto.BuyingDto;
+import com.example.investment.dto.InvestLogDto;
+import com.example.investment.dto.InvestmentDto;
+import com.example.investment.dto.UserDto;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
 import com.example.investment.repository.InvestLogRepository;
@@ -55,10 +55,10 @@ public class InvestmentController {
     /** 自動取引タスク */
     @Scheduled(initialDelay = 11000, fixedRate = 3000)
     public void autoInvestment(){
-        List<UserDao> userDaoList = userRepository.findAll();
-        for (UserDao userDao: userDaoList) {
-            if (userDao.getAuto() != null) {
-                investmentService.autoInvestment(userDao);
+        List<UserDto> userDtoList = userRepository.findAll();
+        for (UserDto userDto: userDtoList) {
+            if (userDto.getAuto() != null) {
+                investmentService.autoInvestment(userDto);
             }
         }      
     }
@@ -66,15 +66,15 @@ public class InvestmentController {
     /** ホーム画面に遷移する */
     @GetMapping(path = "home")
     String home(Model model) {
-        List<InvestmentDao> investList = investmentRepository.findByList();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
+        List<InvestmentDto> investList = investmentRepository.findByList();
+        List<InvestLogDto> investLogDtoList = investLogRepository.findOrderByDateList();
         try {
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
 
             model.addAttribute("userName", userName);
             model.addAttribute("investList", investList);
-            model.addAttribute("investLogDaoList", investLogDaoList);
+            model.addAttribute("investLogDtoList", investLogDtoList);
             return "Invest/InvestHome";
         } catch (Exception e) {
             return "redirect:/login";
@@ -105,13 +105,13 @@ public class InvestmentController {
     /** 売買画面遷移 */
     @GetMapping(path = "buying")
     String buying(Model model) {
-        List<InvestmentDao> investList = investmentRepository.findByList();
+        List<InvestmentDto> investList = investmentRepository.findByList();
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        List<BuyingDao> buyList = buyingRepository.findByUserIdList(userId);
+        List<BuyingDto> buyList = buyingRepository.findByUserIdList(userId);
     
         model.addAttribute("investList", investList);
         model.addAttribute("buyList", buyList);
-        model.addAttribute("userDao", userRepository.findById(userId).get());
+        model.addAttribute("userDto", userRepository.findById(userId).get());
         return "Invest/buying";
     }
 
@@ -119,8 +119,8 @@ public class InvestmentController {
     @PostMapping(path = "buyInvest")
     String buyInvest(@RequestParam String id, int quantity, Model model) {
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        UserDao userDao = userRepository.findById(userId).get();
-        investmentService.buying(userDao, id, quantity);
+        UserDto userDto = userRepository.findById(userId).get();
+        investmentService.buying(userDto, id, quantity);
         return "redirect:buying";
     }
 
@@ -128,8 +128,8 @@ public class InvestmentController {
     @PostMapping(path = "sellInvest")
     String sellInvest(@RequestParam String id, int quantity, Model model) {
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        UserDao userDao = userRepository.findById(userId).get();
-        investmentService.selling(userDao, id, quantity);
+        UserDto userDto = userRepository.findById(userId).get();
+        investmentService.selling(userDto, id, quantity);
         return "redirect:buying";
     }
 
@@ -137,14 +137,14 @@ public class InvestmentController {
     @GetMapping(path = "detail")
     String investDetail(@RequestParam String id, Model model){
         try {
-            InvestmentDao investDao = investmentRepository.findById(id).get();
-            List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList(id);
+            InvestmentDto investDto = investmentRepository.findById(id).get();
+            List<InvestLogDto> investLogDtoList = investLogRepository.findByInvestIdOrderByDateList(id);
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
             
             model.addAttribute("userName", userName);
-            model.addAttribute("investDao", investDao);
-            model.addAttribute("investLogDaoList", investLogDaoList);
+            model.addAttribute("investDto", investDto);
+            model.addAttribute("investLogDtoList", investLogDtoList);
             return "Invest/Detail";
         } catch (Exception e) {
             return "redirect:/login";
@@ -155,13 +155,13 @@ public class InvestmentController {
     @PostMapping(path = "auto")
     String auto(@RequestParam String auto, Model model) {
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        UserDao userDao = userRepository.findById(userId).get();
+        UserDto userDto = userRepository.findById(userId).get();
         if ("true".equals(auto)) {
-            userDao.setAuto(true);
+            userDto.setAuto(true);
         } else {
-            userDao.setAuto(null);
+            userDto.setAuto(null);
         }
-        userRepository.save(userDao);
+        userRepository.save(userDto);
         return "redirect:buying";
     }
 }

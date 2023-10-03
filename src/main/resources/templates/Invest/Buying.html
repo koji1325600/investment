@@ -7,8 +7,8 @@
 </head>
 <script src="../../js/Buying.js"></script>
 <script type="text/javascript" th:inline="javascript">
-  var userDao = /*[[${userDao}]]*/"userDao";
-  var auto = userDao.auto;
+  var userDto = /*[[${userDto}]]*/"userDto";
+  var auto = userDto.auto;
   if (auto == null) {
     auto = "false";
   }
@@ -28,7 +28,7 @@
     個数
     <input type="text" name="quantity">
     <button>購入</button>
-    <a th:text="${userDao.money}"></a>
+    <a th:text="${userDto.money}"></a>
   </form>
   <select id="auto" name="auto">
     <option value="true">自動取引ON</option>

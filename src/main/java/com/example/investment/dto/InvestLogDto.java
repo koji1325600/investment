@@ -1,4 +1,4 @@
-package com.example.investment.dao;
+package com.example.investment.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="investlog")
-public class InvestLogDao implements Serializable {
+public class InvestLogDto implements Serializable {
     /** デフォルトシリアルUID */
     private static final long serialVersionUID = 1L;
 
@@ -41,7 +41,7 @@ public class InvestLogDao implements Serializable {
     /**
      * デフォルトコンストラクタ。
      */
-    public void addTodoDao() {
+    public void addTodoDto() {
         this.id = UUID.randomUUID().toString();
     }
 }

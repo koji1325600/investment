@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.investment.dao.UserDao;
+import com.example.investment.dto.UserDto;
 import com.example.investment.repository.UserRepository;
 
 @Controller
@@ -30,18 +30,18 @@ public class LoginController {
 	/** ログイン処理を行う */
     @PostMapping(path="investLogin")
     String todoLogin(@RequestParam String mailaddress, String password, Pbkdf2PasswordEncoder passwordEncoder, Model model){
-        UserDao userDao = userRepository.findByMailaddressDao(mailaddress);
-        if (userDao == null) {
+        UserDto userDto = userRepository.findByMailaddressDto(mailaddress);
+        if (userDto == null) {
             //ログイン画面に戻る
             return "redirect:/login";
         }
         //パスワードがDBと一致しなかった場合
-        if (!passwordEncoder.matches(password,userDao.getPassword())) {
+        if (!passwordEncoder.matches(password,userDto.getPassword())) {
             //ログイン画面に戻る
             return "redirect:/login";
         }
         //SessionにユーザIDを設定
-        httpServletRequest.getSession().setAttribute("userId", userDao.getUserId());
+        httpServletRequest.getSession().setAttribute("userId", userDto.getUserId());
         return "redirect:invest/home";
     }
 

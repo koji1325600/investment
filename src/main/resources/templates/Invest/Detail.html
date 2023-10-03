@@ -8,14 +8,14 @@
 <script src="../../js/Detail.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
-  var investLogDaoList = /*[[${investLogDaoList}]]*/"investLogDaoList";
+  var investLogDtoList = /*[[${investLogDtoList}]]*/"investLogDtoList";
   window.onload = function(){
     var ctx = document.getElementById("graph-area").getContext("2d");
-    window.myLine = new Chart(ctx, createLineGraphDate(investLogDaoList));
+    window.myLine = new Chart(ctx, createLineGraphDate(investLogDtoList));
   }
 </script>
 <body>
-  <input type="hidden" id="investId" th:value="${investDao.id}">
+  <input type="hidden" id="investId" th:value="${investDto.id}">
   <h2>取引詳細</h2>
   <div class="div">
     <a th:text="${userName}"></a>さん、ようこそ。
@@ -33,9 +33,9 @@
       <th>最小価格</th>
     </tr>
     <tr>
-      <td><a th:text="${investDao.name}"></a></td>
-      <td><a th:text="${investDao.maxPrice}"></a></td>
-      <td><a th:text="${investDao.minPrice}"></a></td>
+      <td><a th:text="${investDto.name}"></a></td>
+      <td><a th:text="${investDto.maxPrice}"></a></td>
+      <td><a th:text="${investDto.minPrice}"></a></td>
     </tr>
   </table>
   <table>
@@ -45,9 +45,9 @@
       <th>　調子　</th>
     </tr>
     <tr>
-      <td><a th:text="${investDao.price}"></a></td>
-      <td><a th:text="${investDao.crash}"></a></td>
-      <td><a th:text="${investDao.condit}"></a></td>
+      <td><a th:text="${investDto.price}"></a></td>
+      <td><a th:text="${investDto.crash}"></a></td>
+      <td><a th:text="${investDto.condit}"></a></td>
     </tr>
   </table>
   <div class="mt1">

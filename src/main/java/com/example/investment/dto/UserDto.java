@@ -1,4 +1,4 @@
-package com.example.investment.dao;
+package com.example.investment.dto;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -13,7 +13,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="user")
-public class UserDao implements Serializable {
+public class UserDto implements Serializable {
     /** デフォルトシリアルUID */
     private static final long serialVersionUID = 1L;
 
@@ -38,10 +38,14 @@ public class UserDao implements Serializable {
     @Column
     private int money;
 
+    /** 自動取引設定 */
+    @Column
+    private Boolean auto;
+
     /**
      * デフォルトコンストラクタ。
      */
-    public void addTodoDao() {
+    public void addTodoDto() {
         this.userId = UUID.randomUUID().toString();
     }
 }

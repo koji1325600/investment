@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.investment.dao.BuyingDao;
-import com.example.investment.dao.InvestmentDao;
-import com.example.investment.dao.InvestLogDao;
+import com.example.investment.dto.BuyingDto;
+import com.example.investment.dto.InvestLogDto;
+import com.example.investment.dto.InvestmentDto;
+import com.example.investment.dto.UserDto;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
 import com.example.investment.repository.InvestLogRepository;
@@ -51,18 +52,29 @@ public class InvestmentController {
         investmentService.fluctuation();
     }
 
+    /** 自動取引タスク */
+    @Scheduled(initialDelay = 11000, fixedRate = 3000)
+    public void autoInvestment(){
+        List<UserDto> userDtoList = userRepository.findAll();
+        for (UserDto userDto: userDtoList) {
+            if (userDto.getAuto() != null) {
+                investmentService.autoInvestment(userDto);
+            }
+        }      
+    }
+
     /** ホーム画面に遷移する */
     @GetMapping(path = "home")
     String home(Model model) {
-        List<InvestmentDao> investList = investmentRepository.findByList();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findOrderByDateList();
+        List<InvestmentDto> investList = investmentRepository.findByList();
+        List<InvestLogDto> investLogDtoList = investLogRepository.findOrderByDateList();
         try {
             String userId = httpServletRequest.getSession().getAttribute("userId").toString();
             String userName = userRepository.findById(userId).get().getUserName();
 
             model.addAttribute("userName", userName);
             model.addAttribute("investList", investList);
-            model.addAttribute("investLogDaoList", investLogDaoList);
+            model.addAttribute("investLogDtoList", investLogDtoList);
             return "Invest/InvestHome";
         } catch (Exception e) {
             return "redirect:/login";
@@ -93,41 +105,63 @@ public class InvestmentController {
     /** 売買画面遷移 */
     @GetMapping(path = "buying")
     String buying(Model model) {
-        List<InvestmentDao> investList = investmentRepository.findByList();
+        List<InvestmentDto> investList = investmentRepository.findByList();
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        List<BuyingDao> buyList = buyingRepository.findByUserIdList(userId);
+        List<BuyingDto> buyList = buyingRepository.findByUserIdList(userId);
     
         model.addAttribute("investList", investList);
         model.addAttribute("buyList", buyList);
-        model.addAttribute("money", userRepository.findById(userId).get().getMoney());
+        model.addAttribute("userDto", userRepository.findById(userId).get());
         return "Invest/buying";
     }
 
     /** 取引購入 */
     @PostMapping(path = "buyInvest")
     String buyInvest(@RequestParam String id, int quantity, Model model) {
-        investmentService.buying(id, quantity);
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDto userDto = userRepository.findById(userId).get();
+        investmentService.buying(userDto, id, quantity);
         return "redirect:buying";
     }
 
     /** 取引売却 */
     @PostMapping(path = "sellInvest")
     String sellInvest(@RequestParam String id, int quantity, Model model) {
-        investmentService.selling(id, quantity);
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        UserDto userDto = userRepository.findById(userId).get();
+        investmentService.selling(userDto, id, quantity);
         return "redirect:buying";
     }
 
     /** 取引詳細画面遷移 */
     @GetMapping(path = "detail")
     String investDetail(@RequestParam String id, Model model){
-        InvestmentDao investDao = investmentRepository.findById(id).get();
-        List<InvestLogDao> investLogDaoList = investLogRepository.findByInvestIdOrderByDateList(id);
+        try {
+            InvestmentDto investDto = investmentRepository.findById(id).get();
+            List<InvestLogDto> investLogDtoList = investLogRepository.findByInvestIdOrderByDateList(id);
+            String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+            String userName = userRepository.findById(userId).get().getUserName();
+            
+            model.addAttribute("userName", userName);
+            model.addAttribute("investDto", investDto);
+            model.addAttribute("investLogDtoList", investLogDtoList);
+            return "Invest/Detail";
+        } catch (Exception e) {
+            return "redirect:/login";
+        }
+    }
+
+    /** 自動取引切り替え */
+    @PostMapping(path = "auto")
+    String auto(@RequestParam String auto, Model model) {
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        String userName = userRepository.findById(userId).get().getUserName();
-        
-        model.addAttribute("userName", userName);
-        model.addAttribute("investDao", investDao);
-        model.addAttribute("investLogDaoList", investLogDaoList);
-        return "Invest/Detail";
+        UserDto userDto = userRepository.findById(userId).get();
+        if ("true".equals(auto)) {
+            userDto.setAuto(true);
+        } else {
+            userDto.setAuto(null);
+        }
+        userRepository.save(userDto);
+        return "redirect:buying";
     }
 }

@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import com.example.investment.dao.InvestmentDao;
+import com.example.investment.dto.InvestmentDto;
 
-public interface InvestmentRepository extends JpaRepository<InvestmentDao, String>, JpaSpecificationExecutor<InvestmentDao> {
+public interface InvestmentRepository extends JpaRepository<InvestmentDto, String>, JpaSpecificationExecutor<InvestmentDto> {
     /** 全取引リスト取得*/
-    @Query("SELECT X FROM InvestmentDao X")
-    List<InvestmentDao> findByList();
+    @Query("SELECT X FROM InvestmentDto X")
+    List<InvestmentDto> findByList();
 }

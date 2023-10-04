@@ -43,14 +43,14 @@ function action(params) {
   form.submit();
 }
 
-function createLineGraphDate(investLogDaoList, investName1, investName2) {
-  var averageLogList = investLogDaoList.filter(investLog => {
+function createLineGraphDate(investLogDtoList, investName1, investName2) {
+  var averageLogList = investLogDtoList.filter(investLog => {
     return investLog.investName == "アベレージ";
   });
-  var logList1 = investLogDaoList.filter(investLog => {
+  var logList1 = investLogDtoList.filter(investLog => {
     return investLog.investName == investName1;
   });
-  var logList2 = investLogDaoList.filter(investLog => {
+  var logList2 = investLogDtoList.filter(investLog => {
     return investLog.investName == investName2;
   });
 

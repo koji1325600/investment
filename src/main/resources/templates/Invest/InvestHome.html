@@ -6,10 +6,9 @@
   <title>ホーム</title>
 </head>
 <script src="../../js/Home.js"></script>
-<script src="../../js/TodoCheck.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
-  var investLogDaoList = /*[[${investLogDaoList}]]*/"investLogDaoList";
+  var investLogDtoList = /*[[${investLogDtoList}]]*/"investLogDtoList";
   var investList = /*[[${investList}]]*/"investList";
   var investName1 = /*[[${investName1}]]*/"investName1";
   var investName2 = /*[[${investName2}]]*/"investName2";
@@ -25,7 +24,7 @@
     selected(options3, graphType);
     var ctx = document.getElementById("graph-area").getContext("2d");
     if (graphType == null || graphType == "line") {
-      window.myLine = new Chart(ctx, createLineGraphDate(investLogDaoList, investName1, investName2));
+      window.myLine = new Chart(ctx, createLineGraphDate(investLogDtoList, investName1, investName2));
     } else {
       window.myLine = new Chart(ctx, createPieGraphDate(investList));
     }

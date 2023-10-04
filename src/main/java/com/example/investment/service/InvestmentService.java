@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 import com.example.investment.dto.BuyingDto;
 import com.example.investment.dto.InvestLogDto;
 import com.example.investment.dto.InvestmentDto;
+import com.example.investment.dto.SellingDto;
 import com.example.investment.dto.UserDto;
 import com.example.investment.form.InvestmentForm;
 import com.example.investment.repository.BuyingRepository;
 import com.example.investment.repository.InvestLogRepository;
 import com.example.investment.repository.InvestmentRepository;
+import com.example.investment.repository.SellingRepository;
 import com.example.investment.repository.UserRepository;
 
 @Service
@@ -37,6 +39,9 @@ public class InvestmentService {
 
     @Autowired
     InvestLogRepository investLogRepository;
+
+    @Autowired
+    SellingRepository sellingRepository;
 
     /** 取引追加処理 */
     public void addInvent(InvestmentForm investmentForm) {
@@ -73,20 +78,25 @@ public class InvestmentService {
 
     /** 取引価格変動ログ追加 */
     public void addInvestLog(InvestmentDto investDto) {
-        //DateTimeFormatterクラスのオブジェクトを生成する
-    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        //現在日時を取得し、フォーマット変換する
-        LocalDateTime nowDefaltDate = LocalDateTime.now();
-        LocalDateTime nowDateTime = LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
         InvestLogDto investLogDto = new InvestLogDto();
 
         investLogDto.setInvestId(investDto.getId());
         investLogDto.setInvestName(investDto.getName());
         investLogDto.setPrice(investDto.getPrice());
-        investLogDto.setDate(nowDateTime);
+        investLogDto.setDate(getNowLocalDateTime());
         investLogDto.addTodoDto();
 
         investLogRepository.save(investLogDto);
+    }
+
+    /** 現在日時取得 */
+    public LocalDateTime getNowLocalDateTime() {
+        //DateTimeFormatterクラスのオブジェクトを生成する
+    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        //現在日時を取得し、フォーマット変換する
+        LocalDateTime nowDefaltDate = LocalDateTime.now();
+        LocalDateTime nowDateTime = LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
+        return nowDateTime;
     }
 
     /** 容量を超えたログを削除する。 */
@@ -140,10 +150,20 @@ public class InvestmentService {
             //暴落した商品を売却する
             for (BuyingDto buyingDto: buyingList) {
                 UserDto userDto = userRepository.findById(buyingDto.getUserId()).get();
-                int money = buyingDto.getQuantity() * investDto.getCrash();
+                int quantity = buyingDto.getQuantity();
+                if (quantity != 1) {
+                    quantity /= 2;
+                }
+                int money = quantity * investDto.getMinPrice();
                 userDto.setMoney(userDto.getMoney() + money);
                 userRepository.save(userDto);
-                buyingRepository.delete(buyingDto);
+                buyingDto.setQuantity(buyingDto.getQuantity() - quantity);
+                if (buyingDto.getQuantity() == 0) {
+                    buyingRepository.delete(buyingDto);
+                } else {
+                    buyingRepository.save(buyingDto);
+                }
+                
             }
         }
 
@@ -262,6 +282,31 @@ public class InvestmentService {
         int money = quantity * investDto.getPrice();
         userDto.setMoney(userDto.getMoney() + money);
         userRepository.save(userDto);
+
+        //売却履歴作成
+        SellingDto sellingDto = new SellingDto();
+        sellingDto.setInvestId(id);
+        sellingDto.setUserId(userId);
+        sellingDto.setInvestName(investDto.getName());
+        sellingDto.setUserName(userDto.getUserName());
+        sellingDto.setSellPrice(money);
+        sellingDto.setDate(getNowLocalDateTime());
+        sellingDto.addTodoDto();
+        sellingRepository.save(sellingDto);
+        deleteSelling();
+    }
+
+    /** 容量を超えた売却履歴を削除 */
+    public void deleteSelling() {
+        List<SellingDto> sellingDtoList = sellingRepository.findOrderByDateDescList();
+        int size = sellingDtoList.size();
+
+        if (size > 300) {
+            int deleteSize = size - 300;
+            for (int i = size - 1; i > size - deleteSize; i--) {
+                sellingRepository.delete(sellingDtoList.get(i));
+            }
+        }
     }
 
     /** 自動取引処理 */
@@ -284,7 +329,7 @@ public class InvestmentService {
 
         for (BuyingDto buyingDto: buyingDtoList) {
             InvestmentDto investDto = investmentRepository.findById(buyingDto.getInvestId()).get();
-            if ("絶好調".equals(investDto.getCondit()) || "好調".equals(investDto.getCondit()) || "アベレージ".equals(investDto.getName())) {
+            if ("絶好調".equals(investDto.getCondit()) || "アベレージ".equals(investDto.getName())) {
                 continue;
             }
             if (sellCheck(investDto)) {
@@ -304,13 +349,13 @@ public class InvestmentService {
         String condit = investDto.getCondit();
 
         if (minPrice + minRangePrice < price && price < minPrice + rangePrice) {
-            count += rand();
+            count++;
         }
         if ("好調".equals(condit)) {
             count++;
         }
         if ("絶好調".equals(condit)) {
-            count += rand();
+            count += rand() + 1;
         }
         if (count > 0 && money > price * 10) {
             count += rand() + 1;
@@ -331,7 +376,10 @@ public class InvestmentService {
         if ("絶不調".equals(condit)) {
             flg = true;
         }
-        if (price > maxPrice - minRangePrice) {
+        if ("好調".equals(condit) && price > maxPrice) {
+            flg = true;
+        }
+        if ("普通".equals(condit) && price > maxPrice - minRangePrice) {
             flg = true;
         }
         if ("不調".equals(condit) && price > minPrice + rangePrice) {
@@ -344,7 +392,6 @@ public class InvestmentService {
     /** 乱数処理 */
     public int rand() {
         Random rand = new Random();
-        int random = rand.nextInt(3);
-        return random;
+        return rand.nextInt(3);
     }
 }

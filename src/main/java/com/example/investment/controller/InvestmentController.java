@@ -11,14 +11,19 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.investment.dto.AssetsDto;
 import com.example.investment.dto.BuyingDto;
+import com.example.investment.dto.InvestId;
 import com.example.investment.dto.InvestLogDto;
 import com.example.investment.dto.InvestmentDto;
 import com.example.investment.dto.UserDto;
 import com.example.investment.form.InvestmentForm;
+import com.example.investment.repository.AssetsRepository;
 import com.example.investment.repository.BuyingRepository;
 import com.example.investment.repository.InvestLogRepository;
 import com.example.investment.repository.InvestmentRepository;
@@ -45,6 +50,9 @@ public class InvestmentController {
 
     @Autowired
     InvestmentService investmentService;
+
+    @Autowired
+    AssetsRepository assetsRepository;
 
     /** 価格変動タスク */
     @Scheduled(initialDelay = 10000, fixedRate = 3000)
@@ -81,6 +89,7 @@ public class InvestmentController {
         }
     }
 
+    /** ホーム画面再送処理 */
     @GetMapping(path = "reHome")
     String reHome(@RequestParam String investName1, String investName2, String graphType, Model model){
         model.addAttribute("investName1", investName1);
@@ -105,14 +114,28 @@ public class InvestmentController {
     /** 売買画面遷移 */
     @GetMapping(path = "buying")
     String buying(Model model) {
-        List<InvestmentDto> investList = investmentRepository.findByList();
+        try {
+            List<InvestmentDto> investList = investmentRepository.findByList();
+            String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+            List<BuyingDto> buyList = buyingRepository.findByUserIdList(userId);
+            List<AssetsDto> assetsDtoList = assetsRepository.findByUserIdOrderByDateList(userId);
+        
+            model.addAttribute("investList", investList);
+            model.addAttribute("buyList", buyList);
+            model.addAttribute("assetsDtoList", assetsDtoList);
+            model.addAttribute("userDto", userRepository.findById(userId).get());
+            return "Invest/buying";
+        } catch (Exception e) {
+            return "redirect:/login";
+        }
+    }
+
+    /** 売買画面 グラフ更新処理 */
+    @PostMapping(path = "buyingAjax")
+    @ResponseBody
+    List<AssetsDto> buyingAjax(){
         String userId = httpServletRequest.getSession().getAttribute("userId").toString();
-        List<BuyingDto> buyList = buyingRepository.findByUserIdList(userId);
-    
-        model.addAttribute("investList", investList);
-        model.addAttribute("buyList", buyList);
-        model.addAttribute("userDto", userRepository.findById(userId).get());
-        return "Invest/buying";
+        return assetsRepository.findByUserIdOrderByDateList(userId);
     }
 
     /** 取引購入 */
@@ -149,6 +172,20 @@ public class InvestmentController {
         } catch (Exception e) {
             return "redirect:/login";
         }
+    }
+
+    /** 取引詳細画面 グラフ更新処理 */
+    @PostMapping(path = "detailGraphAjax")
+    @ResponseBody
+    List<InvestLogDto> detailGraphAjax(@RequestBody InvestId investId){
+        return investLogRepository.findByInvestIdOrderByDateList(investId.getInvestId());
+    }
+
+    /** 取引詳細画面 テーブル更新処理 */
+    @PostMapping(path = "detailTableAjax")
+    @ResponseBody
+    InvestmentDto detailTableAjax(@RequestBody InvestId investId){
+        return investmentRepository.findById(investId.getInvestId()).get();
     }
 
     /** 自動取引切り替え */

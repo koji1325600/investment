@@ -1,18 +1,44 @@
-setTimeout(function () {
-    const form = document.createElement('form');
-    form.method = 'get';
-    form.action = 'detail';
-  
-    const params = document.getElementById("investId").value;
-    const hiddenField = document.createElement('input');
-    hiddenField.type = 'hidden';
-    hiddenField.name = 'id';
-    hiddenField.value = params;
-  
-    form.appendChild(hiddenField);
-    document.body.appendChild(form);
-    form.submit();
-  }, 5000);
+setInterval(function () {
+  var investId = document.getElementById("investId").value;
+  var data = {
+    investId: investId,
+  }
+
+  $.ajax({
+    url: 'detailGraphAjax',
+    type: 'POST',
+    data: JSON.stringify(data),
+    dataType: "json",
+    contentType: 'application/json',
+  })
+  .done(function(investLogDtoList) {
+    window.myLine.destroy();
+    var ctx = document.getElementById("graph-area").getContext("2d");
+    window.myLine = new Chart(ctx, createLineGraphDate(investLogDtoList));
+  })
+  .fail(function() {
+    alert("error!");  // 通信に失敗した場合の処理
+  })
+
+  $.ajax({
+    url: 'detailTableAjax',
+    type: 'POST',
+    data: JSON.stringify(data),
+    dataType: "json",
+    contentType: 'application/json',
+  })
+  .done(function(investDto) {
+    document.getElementById("maxPrice").innerText = investDto.maxPrice;
+    document.getElementById("minPrice").innerText = investDto.minPrice;
+    document.getElementById("price").innerText = investDto.price;
+    document.getElementById("crash").innerText = investDto.crash;
+    document.getElementById("condit").innerText = investDto.condit;
+  })
+  .fail(function() {
+    alert("error!");  // 通信に失敗した場合の処理
+  })
+}, 5000);
+
 function createLineGraphDate(investLogDtoList) {
     var investName = investLogDtoList[0].investName;
     var investPriceList = investLogDtoList.map(function( value ) {

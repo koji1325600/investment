@@ -12,4 +12,8 @@ public interface AssetsRepository extends JpaRepository<AssetsDto, String>, JpaS
     /** 全資産ログリスト取得 日時ソート 降順*/
     @Query("SELECT X FROM AssetsDto X ORDER BY X.date DESC")
     List<AssetsDto> findOrderByDateDescList();
+
+    /** ユーザID資産ログリスト取得 日時ソート*/
+    @Query("SELECT X FROM AssetsDto X WHERE X.userId = ?1 ORDER BY X.date")
+    List<AssetsDto> findByUserIdOrderByDateList(String userId);
 }

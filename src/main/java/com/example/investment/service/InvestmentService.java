@@ -304,8 +304,7 @@ public class InvestmentService {
             buyingDto.setQuantity(quantity);
             buyingDto.setBuyPrice(investDto.getPrice());
         } else {
-            quantity = quantity + buyingDto.getQuantity();
-            buyingDto.setQuantity(quantity);
+            buyingDto.setQuantity(quantity + buyingDto.getQuantity());
             buyingDto.setBuyPrice(investDto.getPrice());
         }
 

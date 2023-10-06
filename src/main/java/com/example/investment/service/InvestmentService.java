@@ -150,8 +150,7 @@ public class InvestmentService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         //現在日時を取得し、フォーマット変換する
         LocalDateTime nowDefaltDate = LocalDateTime.now();
-        LocalDateTime nowDateTime = LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
-        return nowDateTime;
+        return LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
     }
 
     /** 容量を超えたログを削除する。 */
@@ -209,7 +208,7 @@ public class InvestmentService {
                 if (quantity != 1) {
                     quantity /= 2;
                 }
-                int money = quantity * investDto.getMinPrice();
+                int money = quantity * investDto.getCrash();
                 userDto.setMoney(userDto.getMoney() + money);
                 userRepository.save(userDto);
                 buyingDto.setQuantity(buyingDto.getQuantity() - quantity);
@@ -425,7 +424,7 @@ public class InvestmentService {
             count += rand() + 1;
         }
         if (count > 0 && money > price * 10) {
-            count += rand() + 1;
+            count += rand() + rand();
         }
         return count;
     }

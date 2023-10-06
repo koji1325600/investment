@@ -14,6 +14,47 @@ setInterval(function () {
   .fail(function() {
     alert("error!");  // 通信に失敗した場合の処理
   })
+
+  $.ajax({
+    url: 'buyingUserAjax',
+    type: 'POST',
+    data: "",
+    dataType: "json",
+    contentType: 'application/json',
+  })
+  .done(function(userDto) {
+    document.getElementById("money").innerText = userDto.money;
+  })
+  .fail(function() {
+    alert("error!");  // 通信に失敗した場合の処理
+  })
+
+  $.ajax({
+    url: 'buyingTableAjax',
+    type: 'POST',
+    data: "",
+    dataType: "json",
+    contentType: 'application/json',
+  })
+  .done(function(buyList) {
+    $('#sellInvest > option').remove();
+    let i = 0;
+    for (i = 0; i < buyList.length; i++) {
+      $('#sellInvest').append($('<option>').html(buyList[i].investName).val(buyList[i].investId));
+    }
+
+    $('#buyTable').find("tr:gt(0)").remove();
+    for (i = 0; i < buyList.length; i++) {
+      let trTag = $("<tr/>");
+      trTag.append($("<td></td>").text(decodeURI(buyList[i].investName)));
+      trTag.append($("<td></td>").text(decodeURI(buyList[i].quantity)));
+      trTag.append($("<td></td>").text(decodeURI(buyList[i].buyPrice)));
+      $('#buyTable').append(trTag);
+    }
+  })
+  .fail(function() {
+    alert("error!");  // 通信に失敗した場合の処理
+  })
 }, 5000);
 
 function createLineGraphDate(assetsDtoList) {

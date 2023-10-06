@@ -25,7 +25,7 @@
 <body>
   <h2>売買</h2>
   <form action="buyInvest" method="POST">
-    <select name="id">
+    <select id="buyInvest" name="id">
       <tr th:each="invest : ${investList}">
         <option th:value="${invest.id}"><a th:text="${invest.name}"></a></option>
       </tr>
@@ -33,14 +33,14 @@
     個数
     <input type="text" name="quantity">
     <button>購入</button>
-    <a th:text="${userDto.money}"></a>
+    <a id="money" th:text="${userDto.money}"></a>
   </form>
   <select id="auto" name="auto">
     <option value="true">自動取引ON</option>
     <option value="false">自動取引OFF</option>
   </select>
   <form action="sellInvest" method="POST">
-    <select name="id">
+    <select id="sellInvest" name="id">
       <tr th:each="buy : ${buyList}">
         <option th:value="${buy.investId}"><a th:text="${buy.investName}"></a></option>
       </tr>
@@ -50,7 +50,7 @@
     <button>売却</button>
   </form>
   <h2>購入取引一覧</h2>
-  <table>
+  <table id="buyTable">
     <tr style="background-color: #a9a9a9">
       <th>商品名</th>
       <th>個数</th>

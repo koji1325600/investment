@@ -150,6 +150,22 @@ public class InvestmentController {
         return assetsRepository.findByUserIdOrderByDateList(userId);
     }
 
+    /** 売買画面　テーブル更新処理 */
+    @PostMapping(path = "buyingTableAjax")
+    @ResponseBody
+    List<BuyingDto> buyingTableAjax(){
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        return buyingRepository.findByUserIdList(userId);
+    }
+
+    /** 売買画面　所持金更新処理 */
+    @PostMapping(path = "buyingUserAjax")
+    @ResponseBody
+    UserDto buyingUserAjax(){
+        String userId = httpServletRequest.getSession().getAttribute("userId").toString();
+        return userRepository.findById(userId).get();
+    }
+
     /** 取引購入 */
     @PostMapping(path = "buyInvest")
     String buyInvest(@RequestParam String id, int quantity, Model model) {

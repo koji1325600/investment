@@ -1,33 +1,67 @@
-setTimeout(function () {
-  const form = document.createElement('form');
-  form.method = 'get';
-  form.action = 'reHome';
+/** グラフ・テーブルの非同期定期更新 */
+setInterval(function () {
+  var investName1 = document.getElementById("investName1").value;
+  var investName2 = document.getElementById("investName2").value;
+  var graphType = document.getElementById("graphType").value;
+  var data = {};
 
-  const params1 = document.getElementById("investName1").value;
-  const hiddenField1 = document.createElement('input');
-  hiddenField1.type = 'hidden';
-  hiddenField1.name = 'investName1';
-  hiddenField1.value = params1;
+  if (graphType == "line") {
+    $.ajax({
+      url: 'homeLineGraphAjax',
+      type: 'POST',
+      data: JSON.stringify(data),
+      dataType: "json",
+      contentType: 'application/json',
+    })
+    .done(function(investLogDtoList) {
+      window.myLine.destroy();
+      var ctx = document.getElementById("graph-area").getContext("2d");
+      window.myLine = new Chart(ctx, createLineGraphDate(investLogDtoList, investName1, investName2));
+    })
+    .fail(function() {
+      alert("error!");  // 通信に失敗した場合の処理
+    })
+  } else {
+    $.ajax({
+      url: 'homePieGraphAjax',
+      type: 'POST',
+      data: JSON.stringify(data),
+      dataType: "json",
+      contentType: 'application/json',
+    })
+    .done(function(investmentList) {
+      window.myLine.destroy();
+      var ctx = document.getElementById("graph-area").getContext("2d");
+      window.myLine = new Chart(ctx, createPieGraphDate(investmentList));
+    })
+    .fail(function() {
+      alert("error!");  // 通信に失敗した場合の処理
+    })
+  }
 
-  const params2 = document.getElementById("investName2").value;
-  const hiddenField2 = document.createElement('input');
-  hiddenField2.type = 'hidden';
-  hiddenField2.name = 'investName2';
-  hiddenField2.value = params2;
-
-  const params3 = document.getElementById("graphType").value;
-  const hiddenField3 = document.createElement('input');
-  hiddenField3.type = 'hidden';
-  hiddenField3.name = 'graphType';
-  hiddenField3.value = params3;
-
-  form.appendChild(hiddenField1);
-  form.appendChild(hiddenField2);
-  form.appendChild(hiddenField3);
-  document.body.appendChild(form);
-  form.submit();
+  $.ajax({
+    url: 'homeTableAjax',
+    type: 'POST',
+    data: JSON.stringify(data),
+    dataType: "json",
+    contentType: 'application/json',
+  })
+  .done(function(investmentList) {
+    $('#investTable').find("tr:gt(0)").remove();
+    let i = 0;
+    for (i = 0; i < investmentList.length; i++) {
+      let trTag = $("<tr class=\"tr\"/>");
+      trTag.append($("<td onclick=\"action('" + investmentList[i].id + "')\"></td>").text(decodeURI(investmentList[i].name)));
+      trTag.append($("<td onclick=\"action('" + investmentList[i].id + "')\"></td>").text(decodeURI(investmentList[i].price)));
+      $('#investTable').append(trTag);
+    }
+  })
+  .fail(function() {
+    alert("error!");  // 通信に失敗した場合の処理
+  })
 }, 5000);
 
+/** 取引詳細画面への遷移アクション */
 function action(params) {
   const form = document.createElement('form');
   form.method = 'get';
@@ -43,6 +77,7 @@ function action(params) {
   form.submit();
 }
 
+/** 折れ線グラフを作成 */
 function createLineGraphDate(investLogDtoList, investName1, investName2) {
   var averageLogList = investLogDtoList.filter(investLog => {
     return investLog.investName == "アベレージ";
@@ -112,6 +147,7 @@ function createLineGraphDate(investLogDtoList, investName1, investName2) {
  return lineChartData;
 }
 
+/** 円グラフを作成 */
 function createPieGraphDate(investmentList) {
   var investList = investmentList.filter(invest => {
     return invest.name != "アベレージ";
@@ -137,10 +173,4 @@ function createPieGraphDate(investmentList) {
     }
   }
   return pieChartData;
-}
-
-function selected(options, selectValue) {
-  for (let option of options) {
-    if(option.value === selectValue) option.selected = true;
-  }
 }

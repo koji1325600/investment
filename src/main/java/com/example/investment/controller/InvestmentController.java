@@ -89,13 +89,25 @@ public class InvestmentController {
         }
     }
 
-    /** ホーム画面再送処理 */
-    @GetMapping(path = "reHome")
-    String reHome(@RequestParam String investName1, String investName2, String graphType, Model model){
-        model.addAttribute("investName1", investName1);
-        model.addAttribute("investName2", investName2);
-        model.addAttribute("graphType", graphType);
-        return home(model);
+    /** ホーム画面　折れ線グラフ更新処理 */
+    @PostMapping(path = "homeLineGraphAjax")
+    @ResponseBody
+    List<InvestLogDto> homeLineGraphAjax(){
+        return investLogRepository.findOrderByDateList();
+    }
+
+    /** ホーム画面　円グラフ更新処理 */
+    @PostMapping(path = "homePieGraphAjax")
+    @ResponseBody
+    List<InvestmentDto> homePieGraphAjax(){
+        return investmentRepository.findByList();
+    }
+
+    /** ホーム画面　テーブル更新処理 */
+    @PostMapping(path = "homeTableAjax")
+    @ResponseBody
+    List<InvestmentDto> homeTableAjax(){
+        return investmentRepository.findByList();
     }
 
     /** 取引新規作成画面遷移 */

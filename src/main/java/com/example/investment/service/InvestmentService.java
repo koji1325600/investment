@@ -11,12 +11,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.investment.dto.AssetsDto;
 import com.example.investment.dto.BuyingDto;
 import com.example.investment.dto.InvestLogDto;
 import com.example.investment.dto.InvestmentDto;
 import com.example.investment.dto.SellingDto;
 import com.example.investment.dto.UserDto;
 import com.example.investment.form.InvestmentForm;
+import com.example.investment.repository.AssetsRepository;
 import com.example.investment.repository.BuyingRepository;
 import com.example.investment.repository.InvestLogRepository;
 import com.example.investment.repository.InvestmentRepository;
@@ -43,6 +45,9 @@ public class InvestmentService {
     @Autowired
     SellingRepository sellingRepository;
 
+    @Autowired
+    AssetsRepository assetsRepository;
+
     /** 取引追加処理 */
     public void addInvent(InvestmentForm investmentForm) {
         InvestmentDto investmentDto = new InvestmentDto();
@@ -57,14 +62,14 @@ public class InvestmentService {
         List<InvestmentDto> investList = investmentRepository.findByList();
         int totalPrice = 0;
 
-        for (InvestmentDto investDto: investList) {
+        for (InvestmentDto investDto : investList) {
             //商品名がアベレージだった場合は平均価格を設定し、
             //それ以外の場合は価格乱数処理を行う
             if ("アベレージ".equals(investDto.getName())) {
                 investDto.setPrice(totalPrice / (investList.size() - 1));
                 investmentRepository.save(investDto);
                 addInvestLog(investDto);
-                System.out.println("アベレージ:" + investDto.getPrice()); 
+                System.out.println("アベレージ:" + investDto.getPrice());
             } else {
                 investmentRepository.save(randomPrice(investDto, investList.indexOf(investDto)));
                 addInvestLog(investDto);
@@ -74,6 +79,56 @@ public class InvestmentService {
         //取引ログの削除処理
         deleteInvestLog();
         System.out.println();
+
+        List<UserDto> userDtoList = userRepository.findAll();
+        for (UserDto userDto : userDtoList) {
+            addAssets(userDto);
+        }
+        deleteAssetsLog();
+    }
+
+    /** 資産ログ追加 */
+    public void addAssets(UserDto userDto) {
+        AssetsDto assetsDto = new AssetsDto();
+        assetsDto.setUserId(userDto.getUserId());
+        assetsDto.setUserName(userDto.getUserName());
+        assetsDto.setPrice(getAssets(userDto));
+        assetsDto.setDate(getNowLocalDateTime());
+        assetsDto.addTodoDto();
+        assetsRepository.save(assetsDto);
+    }
+
+    /** 資産取得処理 */
+    public int getAssets(UserDto userDto) {
+        try {
+            List<BuyingDto> buyingDtoList = buyingRepository.findByUserIdList(userDto.getUserId());
+            int assets = 0;
+            for (BuyingDto buyingDto : buyingDtoList) {
+                int price = investmentRepository.findById(buyingDto.getInvestId()).get().getPrice();
+                assets += buyingDto.getQuantity() * price;
+            }
+            return assets;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /** 容量を超えた資産ログを削除する。 */
+    public void deleteAssetsLog() {
+        List<AssetsDto> assetsDtoList = assetsRepository.findOrderByDateDescList();
+        List<InvestmentDto> investmentDtoList = investmentRepository.findAll();
+        int logSize = assetsDtoList.size();
+        int investSize = investmentDtoList.size();
+        //資産ログが300以上の場合は削除処理を行う
+        if (logSize > 300) {
+            //資産ログが取引数以上300を超えていたら、その分多く削除する。
+            if (logSize > 300 + investSize) {
+                investSize = investSize * 2;
+            }
+            for (int i = logSize - 1; i >= logSize - investSize; i--) {
+                assetsRepository.delete(assetsDtoList.get(i));
+            }
+        }
     }
 
     /** 取引価格変動ログ追加 */
@@ -92,11 +147,10 @@ public class InvestmentService {
     /** 現在日時取得 */
     public LocalDateTime getNowLocalDateTime() {
         //DateTimeFormatterクラスのオブジェクトを生成する
-    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         //現在日時を取得し、フォーマット変換する
         LocalDateTime nowDefaltDate = LocalDateTime.now();
-        LocalDateTime nowDateTime = LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
-        return nowDateTime;
+        return LocalDateTime.parse(nowDefaltDate.format(dtf), dtf);
     }
 
     /** 容量を超えたログを削除する。 */
@@ -148,13 +202,13 @@ public class InvestmentService {
             List<BuyingDto> buyingList = buyingRepository.findByInvestIdList(investDto.getId());
 
             //暴落した商品を売却する
-            for (BuyingDto buyingDto: buyingList) {
+            for (BuyingDto buyingDto : buyingList) {
                 UserDto userDto = userRepository.findById(buyingDto.getUserId()).get();
                 int quantity = buyingDto.getQuantity();
                 if (quantity != 1) {
                     quantity /= 2;
                 }
-                int money = quantity * investDto.getMinPrice();
+                int money = quantity * investDto.getCrash();
                 userDto.setMoney(userDto.getMoney() + money);
                 userRepository.save(userDto);
                 buyingDto.setQuantity(buyingDto.getQuantity() - quantity);
@@ -163,7 +217,7 @@ public class InvestmentService {
                 } else {
                     buyingRepository.save(buyingDto);
                 }
-                
+
             }
         }
 
@@ -188,13 +242,25 @@ public class InvestmentService {
     /** 調子判定処理 */
     public int condition(String condit) {
         int conditNum;
-        switch(condit) {
-            case "絶好調": conditNum = 20; break;
-            case "好調": conditNum = 10; break;
-            case "普通": conditNum = 0; break;
-            case "絶不調": conditNum = -10; break;
-            case "不調": conditNum = -20; break;
-            default: conditNum = 0; break;
+        switch (condit) {
+            case "絶好調":
+                conditNum = 20;
+                break;
+            case "好調":
+                conditNum = 10;
+                break;
+            case "普通":
+                conditNum = 0;
+                break;
+            case "絶不調":
+                conditNum = -10;
+                break;
+            case "不調":
+                conditNum = -20;
+                break;
+            default:
+                conditNum = 0;
+                break;
         }
         return conditNum;
     }
@@ -237,8 +303,7 @@ public class InvestmentService {
             buyingDto.setQuantity(quantity);
             buyingDto.setBuyPrice(investDto.getPrice());
         } else {
-            quantity = quantity + buyingDto.getQuantity();
-            buyingDto.setQuantity(quantity);
+            buyingDto.setQuantity(quantity + buyingDto.getQuantity());
             buyingDto.setBuyPrice(investDto.getPrice());
         }
 
@@ -313,10 +378,11 @@ public class InvestmentService {
     public void autoInvestment(UserDto userDto) {
         List<InvestmentDto> investDtoList = investmentRepository.findAll();
         int count;
-        
+
         if (rand() == 0) {
-            for (InvestmentDto investDto: investDtoList) {
-                if ("絶不調".equals(investDto.getCondit()) || "不調".equals(investDto.getCondit()) || "アベレージ".equals(investDto.getName())) {
+            for (InvestmentDto investDto : investDtoList) {
+                if ("絶不調".equals(investDto.getCondit()) || "不調".equals(investDto.getCondit())
+                        || "アベレージ".equals(investDto.getName())) {
                     continue;
                 }
                 count = buyCheck(investDto, userDto.getMoney());
@@ -327,7 +393,7 @@ public class InvestmentService {
         }
         List<BuyingDto> buyingDtoList = buyingRepository.findByUserIdList(userDto.getUserId());
 
-        for (BuyingDto buyingDto: buyingDtoList) {
+        for (BuyingDto buyingDto : buyingDtoList) {
             InvestmentDto investDto = investmentRepository.findById(buyingDto.getInvestId()).get();
             if ("絶好調".equals(investDto.getCondit()) || "アベレージ".equals(investDto.getName())) {
                 continue;
@@ -358,7 +424,7 @@ public class InvestmentService {
             count += rand() + 1;
         }
         if (count > 0 && money > price * 10) {
-            count += rand() + 1;
+            count += rand() + rand();
         }
         return count;
     }
@@ -385,7 +451,7 @@ public class InvestmentService {
         if ("不調".equals(condit) && price > minPrice + rangePrice) {
             flg = true;
         }
-        
+
         return flg;
     }
 

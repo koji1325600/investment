@@ -6,7 +6,10 @@
   <title>売買</title>
 </head>
 <script src="../../js/Buying.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
+  var assetsDtoList = /*[[${assetsDtoList}]]*/"assetsDtoList";
   var userDto = /*[[${userDto}]]*/"userDto";
   var auto = userDto.auto;
   if (auto == null) {
@@ -15,12 +18,14 @@
   window.onload = function(){
     let options= document.getElementById('auto').options;
     selected(options, auto);
+    var ctx = document.getElementById("graph-area").getContext("2d");
+    window.myLine = new Chart(ctx, createLineGraphDate(assetsDtoList));
   }
 </script>
 <body>
   <h2>売買</h2>
   <form action="buyInvest" method="POST">
-    <select name="id">
+    <select id="buyInvest" name="id">
       <tr th:each="invest : ${investList}">
         <option th:value="${invest.id}"><a th:text="${invest.name}"></a></option>
       </tr>
@@ -28,14 +33,14 @@
     個数
     <input type="text" name="quantity">
     <button>購入</button>
-    <a th:text="${userDto.money}"></a>
+    <a id="money" th:text="${userDto.money}"></a>
   </form>
   <select id="auto" name="auto">
     <option value="true">自動取引ON</option>
     <option value="false">自動取引OFF</option>
   </select>
   <form action="sellInvest" method="POST">
-    <select name="id">
+    <select id="sellInvest" name="id">
       <tr th:each="buy : ${buyList}">
         <option th:value="${buy.investId}"><a th:text="${buy.investName}"></a></option>
       </tr>
@@ -45,7 +50,7 @@
     <button>売却</button>
   </form>
   <h2>購入取引一覧</h2>
-  <table>
+  <table id="buyTable">
     <tr style="background-color: #a9a9a9">
       <th>商品名</th>
       <th>個数</th>
@@ -57,5 +62,8 @@
       <td><a th:text="${buy.buyPrice}"></a></td>
     </tr>
   </table>
+  <div class="mt1">
+    <canvas id="graph-area" class="graph-area"></canvas>
+  </div>
 </body>
 </html>

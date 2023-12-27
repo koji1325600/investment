@@ -6,6 +6,7 @@
   <title>取引詳細</title>
 </head>
 <script src="../../js/Detail.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
   var investLogDtoList = /*[[${investLogDtoList}]]*/"investLogDtoList";
@@ -33,9 +34,9 @@
       <th>最小価格</th>
     </tr>
     <tr>
-      <td><a th:text="${investDto.name}"></a></td>
-      <td><a th:text="${investDto.maxPrice}"></a></td>
-      <td><a th:text="${investDto.minPrice}"></a></td>
+      <td><a th:text="${investDto.name}" id="name"></a></td>
+      <td><a th:text="${investDto.maxPrice}" id="maxPrice"></a></td>
+      <td><a th:text="${investDto.minPrice}" id="minPrice"></a></td>
     </tr>
   </table>
   <table>
@@ -45,9 +46,9 @@
       <th>　調子　</th>
     </tr>
     <tr>
-      <td><a th:text="${investDto.price}"></a></td>
-      <td><a th:text="${investDto.crash}"></a></td>
-      <td><a th:text="${investDto.condit}"></a></td>
+      <td><a th:text="${investDto.price}" id="price"></a></td>
+      <td><a th:text="${investDto.crash}" id="crash"></a></td>
+      <td><a th:text="${investDto.condit}" id="condit"></a></td>
     </tr>
   </table>
   <div class="mt1">

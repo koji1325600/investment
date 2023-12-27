@@ -6,6 +6,7 @@
   <title>ホーム</title>
 </head>
 <script src="../../js/Home.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 <script type="text/javascript" th:inline="javascript">
   var investLogDtoList = /*[[${investLogDtoList}]]*/"investLogDtoList";
@@ -16,12 +17,6 @@
 
   // ▼上記のグラフを描画するための記述
   window.onload = function(){
-    let options1= document.getElementById('investName1').options;
-    let options2= document.getElementById('investName2').options;
-    let options3= document.getElementById('graphType').options;
-    selected(options1, investName1);
-    selected(options2, investName2);
-    selected(options3, graphType);
     var ctx = document.getElementById("graph-area").getContext("2d");
     if (graphType == null || graphType == "line") {
       window.myLine = new Chart(ctx, createLineGraphDate(investLogDtoList, investName1, investName2));
@@ -41,7 +36,7 @@
       <button class="button button2">ログアウト</button>
     </form>
   </div>
-  <table>
+  <table id="investTable">
     <tr style="background-color: #a9a9a9">
       <th>商品名</th>
       <th>価格</th>
